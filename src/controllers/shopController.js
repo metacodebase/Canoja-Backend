@@ -213,14 +213,23 @@ function applySearchFilters(shops, filters) {
   return shops.filter((shop) => {
     // Cannoja Verified - must have active license
     if (filters.cannojaVerified) {
-      if (!shop.isMatched || shop.license_status !== "Active") {
+      if (
+        !shop.isMatched ||
+        !shop.license_status ||
+        shop.license_status.toLowerCase() !== "active"
+      ) {
         return false;
       }
     }
 
     // Open Now
-    if (filters.openNow && !shop.open_now) {
-      return false;
+    if (filters.openNow !== undefined) {
+      if (filters.openNow === true && !shop.open_now) {
+        return false; // User wants only open shops
+      }
+      if (filters.openNow === false && shop.open_now === true) {
+        return false; // User wants only closed shops
+      }
     }
 
     // Operator Type - match against license type
