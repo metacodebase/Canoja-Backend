@@ -403,7 +403,7 @@ async function fetchShopsWithCurrentQuery(
       }
 
       // Take only what we need to reach 10 results
-      const needed = 10;
+      const needed = 5;
       const results = uniqueResults.slice(0, needed);
       state.totalFetched += results.length;
 
@@ -484,7 +484,7 @@ async function getNextShopsBatch(lat, lng, radius, sessionKey) {
   }
 
   let allResults = [];
-  const targetCount = 10;
+  const targetCount = 5;
 
   while (allResults.length < targetCount && getCurrentQuery(sessionKey)) {
     const batchResponse = await fetchShopsWithCurrentQuery(
