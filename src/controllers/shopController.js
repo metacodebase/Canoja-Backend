@@ -579,8 +579,8 @@ async function enhanceShopData(shops) {
 
         photos:
           placeDetails.photos && placeDetails.photos.length > 1
-            ? placeDetails.photos.slice(0, 2).map((photo) => ({
-                // FIRST 2 PHOTOS
+            ? placeDetails.photos.slice(0, 1).map((photo) => ({
+                // FIRST 1 PHOTO
                 photo_reference: photo.photo_reference,
                 height: photo.height,
                 width: photo.width,
