@@ -34,7 +34,7 @@ async function textSearchShops(keyword, filters) {
       let url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${GOOGLE_MAPS_API_KEY}`;
 
       // Add region bias (optional - restricts to country)
-      url += "&region=us";
+      // url += "&region=us";
 
       // Add opennow if needed
       if (filters.openNow) {
@@ -563,13 +563,9 @@ async function enhanceShopData(shops) {
         opening_hours: placeDetails.opening_hours
           ? {
               open_now: placeDetails.opening_hours.open_now || false,
-              periods: placeDetails.opening_hours.periods || [],
-              weekday_text: placeDetails.opening_hours.weekday_text || [],
             }
           : {
               open_now: null,
-              periods: [],
-              weekday_text: [],
             },
 
         photo_url:
@@ -756,7 +752,7 @@ async function geocodeAddress(state, city, zip) {
 
     console.log(`Geocoding address with OpenStreetMap: ${addressString}`);
 
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addressString)}&format=json&limit=1&countrycodes=us`;
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addressString)}&format=json&limit=1`;
 
     const response = await axios.get(url, {
       headers: {
