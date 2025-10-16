@@ -377,13 +377,18 @@ async function fetchShopsWithCurrentQuery(
 
     if (response.data.results) {
       // Filter out duplicates based on place_id
-      const uniqueResults = response.data.results.filter((place) => {
-        if (state.usedPlaceIds.has(place.place_id)) {
-          return false;
-        }
-        state.usedPlaceIds.add(place.place_id);
-        return true;
-      });
+      const uniqueResults = response.data.results
+        .filter((place) => {
+          if (state.usedPlaceIds.has(place.place_id)) {
+            return false;
+          }
+          state.usedPlaceIds.add(place.place_id);
+          return true;
+        })
+        .map((place) => ({
+          ...place,
+          found_by_query: currentQuery, // Track the query that found this shop
+        }));
 
       // Store/update pagination token for this query
       if (response.data.next_page_token) {
@@ -559,6 +564,7 @@ async function enhanceShopData(shops) {
         price_level: placeDetails.price_level || place.price_level,
         types: placeDetails.types || place.types,
         business_status: placeDetails.business_status,
+        found_by_query: place.found_by_query,
 
         opening_hours: placeDetails.opening_hours
           ? {
@@ -606,6 +612,7 @@ async function enhanceShopData(shops) {
         opening_hours: { open_now: null, periods: [], weekday_text: [] },
         photo_url: null,
         photos: [],
+        found_by_query: place.found_by_query,
       });
     }
 
@@ -941,6 +948,7 @@ async function compareShops(req, res) {
         license_status: statusInfo?.license_status,
         isMatched: statusInfo?.matchedRecord !== null,
         matchedLicense: statusInfo?.matchedRecord,
+        smoke_shop: shop.found_by_query === "Smoke Shop",
       };
     });
 
@@ -1093,6 +1101,7 @@ async function getMoreShops(req, res) {
         license_status: statusInfo?.license_status,
         isMatched: statusInfo?.matchedRecord !== null,
         matchedLicense: statusInfo?.matchedRecord,
+        smoke_shop: shop.found_by_query === "Smoke Shop",
       };
     });
 
