@@ -1,8 +1,14 @@
 const axios = require("axios");
 const LicenseRecord = require("../models/licenseRecord");
+const AllShopsController = require("./allShopsController");
+const { parseAddressComponentsEnhanced } = require("../utils/addressParser");
 
 // Configuration
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_API_KEY;
+const MAX_SHOPS_PER_CALL = Math.max(
+  1,
+  parseInt(process.env.MAX_SHOPS_PER_CALL || "3", 30),
+);
 
 // Default search queries (used when no operator type specified)
 const SEARCH_QUERIES = [
@@ -66,7 +72,7 @@ async function textSearchShops(keyword, filters) {
     console.log(`Text search total unique results: ${uniqueResults.length}`);
 
     return {
-      results: uniqueResults,
+      results: uniqueResults.slice(0, MAX_SHOPS_PER_CALL),
       queries_used: keywordQueries,
       total_results: uniqueResults.length,
     };
@@ -80,7 +86,7 @@ async function textSearchShops(keyword, filters) {
 async function getPlaceDetails(placeId) {
   try {
     const fields =
-      "place_id,name,formatted_address,geometry,rating,user_ratings_total,price_level,types,opening_hours,photos,business_status";
+      "place_id,name,formatted_address,geometry,rating,user_ratings_total,types,photos,business_status";
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=${fields}&key=${GOOGLE_MAPS_API_KEY}`;
 
     const response = await axios.get(url);
@@ -408,7 +414,7 @@ async function fetchShopsWithCurrentQuery(
       }
 
       // Take only what we need to reach 10 results
-      const needed = 5;
+      const needed = MAX_SHOPS_PER_CALL;
       const results = uniqueResults.slice(0, needed);
       state.totalFetched += results.length;
 
@@ -489,7 +495,7 @@ async function getNextShopsBatch(lat, lng, radius, sessionKey) {
   }
 
   let allResults = [];
-  const targetCount = 5;
+  const targetCount = MAX_SHOPS_PER_CALL;
 
   while (allResults.length < targetCount && getCurrentQuery(sessionKey)) {
     const batchResponse = await fetchShopsWithCurrentQuery(
@@ -553,10 +559,20 @@ async function enhanceShopData(shops) {
     const placeDetails = await getPlaceDetails(place.place_id);
 
     if (placeDetails) {
+      // Parse city and state from the formatted address
+      const address = placeDetails.formatted_address || place.vicinity;
+      console.log(`DEBUG: Parsing address: "${address}"`);
+      const addressComponents = parseAddressComponentsEnhanced(address);
+      console.log(`DEBUG: Parsed components:`, addressComponents);
+
       const enhancedPlace = {
         ...place,
         name: placeDetails.name || place.name,
-        formatted_address: placeDetails.formatted_address || place.vicinity,
+        formatted_address: address,
+        address: address, // Add address field for consistency
+        city: addressComponents.city,
+        state: addressComponents.stateAbbr,
+        stateName: addressComponents.stateName,
         geometry: placeDetails.geometry || place.geometry,
         rating: placeDetails.rating || place.rating,
         user_ratings_total:
@@ -606,8 +622,18 @@ async function enhanceShopData(shops) {
 
       enhancedResults.push(enhancedPlace);
     } else {
+      // Parse city and state from available address information
+      const address = place.vicinity || place.formatted_address || "";
+      console.log(`DEBUG: Parsing fallback address: "${address}"`);
+      const addressComponents = parseAddressComponentsEnhanced(address);
+      console.log(`DEBUG: Parsed fallback components:`, addressComponents);
+
       enhancedResults.push({
         ...place,
+        address: address,
+        city: addressComponents.city,
+        state: addressComponents.stateAbbr,
+        stateName: addressComponents.stateName,
         business_status: null,
         opening_hours: { open_now: null, periods: [], weekday_text: [] },
         photo_url: null,
@@ -933,6 +959,9 @@ async function compareShops(req, res) {
       return {
         name: shop.name,
         address: shop.formatted_address || shop.vicinity,
+        city: shop.city, // Parsed city from address
+        state: shop.state, // Parsed state abbreviation from address
+        stateName: shop.stateName, // Parsed full state name from address
         lat: shop.geometry.location.lat,
         lng: shop.geometry.location.lng,
         place_id: shop.place_id,
@@ -960,6 +989,22 @@ async function compareShops(req, res) {
     console.log(`Matches found: ${matches.length}`);
     console.log(`Has more: ${hasMore}`);
     if (sessionKey) console.log(`Session key: ${sessionKey}`);
+
+    // Save shops to "All_Shops" collection
+    try {
+      await AllShopsController.saveShops(allGoogleShops, {
+        source: isKeywordSearch ? "compare-shops-text" : "compare-shops",
+        session_key: sessionKey || null,
+        current_query: sessionInfo?.current_query || null,
+        coordinates:
+          typeof lat === "number" && typeof lng === "number"
+            ? { lat, lng }
+            : null,
+        radius: typeof finalRadius === "number" ? finalRadius : null,
+      });
+    } catch (e) {
+      console.error("Failed to save shops to 'All_Shops':", e.message);
+    }
 
     res.json({
       success: true,
@@ -1086,6 +1131,9 @@ async function getMoreShops(req, res) {
       return {
         name: shop.name,
         address: shop.formatted_address || shop.vicinity,
+        city: shop.city, // Parsed city from address
+        state: shop.state, // Parsed state abbreviation from address
+        stateName: shop.stateName, // Parsed full state name from address
         lat: shop.geometry.location.lat,
         lng: shop.geometry.location.lng,
         place_id: shop.place_id,
@@ -1112,6 +1160,22 @@ async function getMoreShops(req, res) {
     console.log(`Additional shops returned: ${allGoogleShops.length}`);
     console.log(`New matches found: ${matches.length}`);
     console.log(`Has more results: ${googleResponse.has_more}`);
+
+    // Save shops to "All_Shops" collection
+    try {
+      await AllShopsController.saveShops(allGoogleShops, {
+        source: "compare-shops/more",
+        session_key,
+        current_query: googleResponse?.session_info?.current_query || null,
+        coordinates:
+          typeof lat === "number" && typeof lng === "number"
+            ? { lat, lng }
+            : null,
+        radius: typeof finalRadius === "number" ? finalRadius : null,
+      });
+    } catch (e) {
+      console.error("Failed to save shops to 'All_Shops':", e.message);
+    }
 
     res.json({
       success: true,

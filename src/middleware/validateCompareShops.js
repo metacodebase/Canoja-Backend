@@ -32,8 +32,8 @@ const validateCompareShops = [
 
   body("radius")
     .optional()
-    .isInt({ min: 100, max: 50000 })
-    .withMessage("Radius must be an integer between 100 and 50000 meters"),
+    .isInt({ min: 1609.34, max: 160934 })
+    .withMessage("Radius must be an integer between 1609.34 and 160934 meters"), // 1 mile to 100 miles
 
   // Check if Google Maps API key is configured
   (req, res, next) => {

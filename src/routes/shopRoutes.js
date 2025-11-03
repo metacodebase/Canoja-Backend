@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const shopController = require("../controllers/shopController");
+const allShopsController = require("../controllers/allShopsController");
 const {
   validateCompareShops,
   handleValidationErrors,
@@ -189,5 +190,51 @@ router.get("/details/:shopId", shopController.getShopDetails);
  *         description: Database error
  */
 router.get("/test-db", shopController.testDatabase);
+
+/**
+ * @swagger
+ * /api/shops/colorado:
+ *   get:
+ *     summary: List shops from the All_Shops collection
+ *     tags:
+ *       - Shops
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 3
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *           example: "Star Buds"
+ *       - in: query
+ *         name: isMatched
+ *         schema:
+ *           type: boolean
+ *           example: true
+ *       - in: query
+ *         name: smoke_shop
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *       - in: query
+ *         name: license_status
+ *         schema:
+ *           type: string
+ *           example: "Active"
+ *     responses:
+ *       200:
+ *         description: Shops retrieved successfully
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/DataBaseShops", allShopsController.listShops);
 
 module.exports = router;
