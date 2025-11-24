@@ -254,6 +254,109 @@ function buildKeywordQuery(keyword, filters) {
   return searchConditions.length > 0 ? { $and: searchConditions } : {};
 }
 
+function isShopOpenNow(shop) {
+  // If permanently closed, definitely not open
+  if (shop.business_status === "PERMANENTLY_CLOSED") {
+    return false;
+  }
+
+  // If temporarily closed, not open
+  if (shop.business_status === "CLOSED_TEMPORARILY") {
+    return false;
+  }
+
+  // If no working hours available
+  if (!shop.working_hours || Object.keys(shop.working_hours).length === 0) {
+    if (shop.business_status === "OPERATIONAL") {
+      return null; // Unknown - operational but no hours
+    }
+    return false;
+  }
+
+  // Get current time in shop's timezone (or default to US Eastern)
+  const timeZone = shop.time_zone || "America/New_York";
+  const now = new Date();
+
+  // Get current day and time in shop's timezone
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timeZone,
+    weekday: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(now);
+  const dayName = parts.find((p) => p.type === "weekday").value;
+  const hour = parseInt(parts.find((p) => p.type === "hour").value);
+  const minute = parseInt(parts.find((p) => p.type === "minute").value);
+  const currentMinutes = hour * 60 + minute;
+
+  // Get today's hours
+  const todayHours = shop.working_hours[dayName];
+
+  if (!todayHours) {
+    return false; // No hours for today means closed
+  }
+
+  // ADD THIS: Check for "Open 24 hours" case
+  if (todayHours.toLowerCase().includes("open 24 hours")) {
+    return true;
+  }
+
+  // Check for "Closed" day
+  if (todayHours.toLowerCase().includes("closed")) {
+    return false;
+  }
+
+  // Parse hours like "10a.m.-10p.m." or "12-10p.m."
+  const hoursMatch = todayHours.match(
+    /(\d+)(a\.m\.|p\.m\.)?-(\d+)(a\.m\.|p\.m\.)/i,
+  );
+
+  if (!hoursMatch) {
+    return null; // Can't parse, unknown
+  }
+
+  let openHour = parseInt(hoursMatch[1]);
+  const openPeriod = hoursMatch[2];
+  let closeHour = parseInt(hoursMatch[3]);
+  const closePeriod = hoursMatch[4];
+
+  // Convert to 24-hour format
+  if (openPeriod && openPeriod.toLowerCase().includes("p") && openHour !== 12) {
+    openHour += 12;
+  }
+  if (openPeriod && openPeriod.toLowerCase().includes("a") && openHour === 12) {
+    openHour = 0;
+  }
+
+  if (
+    closePeriod &&
+    closePeriod.toLowerCase().includes("p") &&
+    closeHour !== 12
+  ) {
+    closeHour += 12;
+  }
+  if (
+    closePeriod &&
+    closePeriod.toLowerCase().includes("a") &&
+    closeHour === 12
+  ) {
+    closeHour = 0;
+  }
+
+  const openMinutes = openHour * 60;
+  const closeMinutes = closeHour * 60;
+
+  // Handle overnight hours (e.g., 10pm - 2am)
+  if (closeMinutes < openMinutes) {
+    return currentMinutes >= openMinutes || currentMinutes < closeMinutes;
+  }
+
+  return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+}
+
 // --- Format shop data for response (WITH BACKWARD COMPATIBILITY) ---
 function formatShopData(record, userLat = null, userLng = null) {
   const [lng, lat] = record.location?.coordinates || [null, null];
@@ -265,6 +368,8 @@ function formatShopData(record, userLat = null, userLng = null) {
     distanceMeters = haversineDistance(userLat, userLng, lat, lng);
     distance = `${Math.round(distanceMeters)}m`;
   }
+
+  const openNowStatus = isShopOpenNow(record);
 
   return {
     // IDs
@@ -352,13 +457,12 @@ function formatShopData(record, userLat = null, userLng = null) {
     business_status: record.business_status,
     opening_hours: record.working_hours
       ? {
-          // ⭐ BACKWARD COMPATIBLE (old name)
-          open_now: record.business_status === "OPERATIONAL",
+          open_now: openNowStatus,
           periods: [],
           weekday_text: [],
         }
       : null,
-    open_now: record.business_status === "OPERATIONAL", // ⭐ BACKWARD COMPATIBLE
+    open_now: openNowStatus,
 
     // Business Details
     about: record.about,
@@ -510,7 +614,7 @@ async function compareShops(req, res) {
       filters = {},
       keyword = null,
       page = 1,
-      limit = 50,
+      limit = 10,
     } = req.body;
 
     const isKeywordSearch = keyword && keyword.trim().length >= 2;
