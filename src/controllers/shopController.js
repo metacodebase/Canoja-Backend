@@ -701,8 +701,13 @@ async function compareShops(req, res) {
         return a.distanceMeters - b.distanceMeters;
       });
 
+      shopsWithDistance = applySearchFilters(shopsWithDistance, filters);
+
+      totalCount = shopsWithDistance.length;
+
       shops = shopsWithDistance.slice(skip, skip + limitNum);
 
+      console.log(`Shops after filtering: ${totalCount}`);
       console.log(`Returning ${shops.length} shops for page ${pageNum}`);
     }
 
@@ -710,7 +715,11 @@ async function compareShops(req, res) {
       ? shops.map((shop) => formatShopData(shop, lat, lng))
       : shops;
 
-    formattedShops = applySearchFilters(formattedShops, filters);
+    if (isKeywordSearch) {
+      formattedShops = applySearchFilters(formattedShops, filters);
+      // Recalculate totalCount after filtering for keyword search
+      totalCount = formattedShops.length;
+    }
 
     const totalPages = Math.ceil(totalCount / limitNum);
     const hasMore = pageNum < totalPages;
