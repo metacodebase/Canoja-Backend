@@ -31,6 +31,12 @@ function applySearchFilters(shops, filters) {
       }
     }
 
+    if (filters.country) {
+      if (shop.country_code?.toLowerCase() !== filters.country.toLowerCase()) {
+        return false;
+      }
+    }
+
     // License Status filter
     if (filters.licenseStatus) {
       if (
@@ -170,6 +176,9 @@ function buildLocationQuery(lat, lng, radius, filters) {
   };
 
   // Add filters that can be done at DB level
+  if (filters.country) {
+    query.country_code = new RegExp(filters.country, "i");
+  }
   if (filters.state) {
     query.stateName = new RegExp(filters.state, "i");
   }
@@ -221,6 +230,10 @@ function buildKeywordQuery(keyword, filters) {
   });
 
   // Add base filters
+  if (filters.country) {
+    // ⭐ ADD THIS
+    searchConditions.push({ country_code: new RegExp(filters.country, "i") });
+  }
   if (filters.smokeShop !== undefined) {
     searchConditions.push({ smoke_shop: filters.smokeShop });
   }
@@ -530,13 +543,14 @@ function formatShopData(record, userLat = null, userLng = null) {
 }
 
 // --- Geocode address using OpenStreetMap ---
-async function geocodeAddress(state, city, zip) {
+async function geocodeAddress(state, city, zip, country = "US") {
   try {
     const axios = require("axios");
     let addressString = "";
     if (city) addressString += city;
     if (state) addressString += (addressString ? ", " : "") + state;
     if (zip) addressString += (addressString ? ", " : "") + zip;
+    if (country) addressString += (addressString ? ", " : "") + country;
 
     if (!addressString) {
       throw new Error(
@@ -581,7 +595,7 @@ async function geocodeAddress(state, city, zip) {
 }
 
 // --- Determine radius based on search specificity ---
-function determineRadius(state, city, zipCode, providedRadius) {
+function determineRadius(state, city, zipCode, providedRadius, country) {
   if (providedRadius && providedRadius !== 5000) {
     console.log(`Using provided radius: ${providedRadius}m`);
     return parseInt(providedRadius);
@@ -596,6 +610,9 @@ function determineRadius(state, city, zipCode, providedRadius) {
   } else if (state) {
     console.log(`Only State provided, using 100km radius`);
     return 100000;
+  } else if (country) {
+    console.log(`Only Country provided, using 1000km radius`);
+    return 1000000;
   } else {
     console.log(`Using default radius: 5km`);
     return 5000;
@@ -611,6 +628,7 @@ async function compareShops(req, res) {
       state,
       city,
       zipCode,
+      country,
       filters = {},
       keyword = null,
       page = 1,
@@ -657,9 +675,14 @@ async function compareShops(req, res) {
         lat = parseFloat(req.body.lat);
         lng = parseFloat(req.body.lng);
         finalRadius = radius ? parseInt(radius) : 5000;
-      } else if (state || city || zipCode) {
-        finalRadius = determineRadius(state, city, zipCode, radius);
-        const geocodeResult = await geocodeAddress(state, city, zipCode);
+      } else if (state || city || zipCode || country) {
+        finalRadius = determineRadius(state, city, zipCode, radius, country);
+        const geocodeResult = await geocodeAddress(
+          state,
+          city,
+          zipCode,
+          country,
+        );
 
         if (!geocodeResult.success) {
           return res.status(400).json({
