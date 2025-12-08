@@ -1,5 +1,60 @@
 const LicenseRecord = require("../models/licenseRecord");
 
+// --- Build MongoDB query for direct country/state/city filtering (NO geocoding) ---
+function buildDirectFilterQuery(country, state, city, filters) {
+  const query = {};
+
+  // Priority: City > State > Country
+  if (city) {
+    query.city = new RegExp(`^${city}$`, "i");
+  }
+
+  if (state) {
+    query.stateName = new RegExp(`^${state}$`, "i");
+  }
+
+  if (country) {
+    query.country_code = new RegExp(`^${country}$`, "i");
+  }
+
+  // Add other filters
+  if (filters.smokeShop !== undefined) {
+    query.smoke_shop = filters.smokeShop;
+  }
+  if (filters.canojaVerified !== undefined) {
+    query.canojaVerified = filters.canojaVerified;
+  }
+  if (filters.featured !== undefined) {
+    query.featured = filters.featured;
+  }
+  if (filters.verified !== undefined) {
+    query.verified = filters.verified;
+  }
+  if (filters.businessStatus) {
+    query.business_status = new RegExp(filters.businessStatus, "i");
+  }
+  if (filters.category) {
+    query.category = new RegExp(filters.category, "i");
+  }
+  if (filters.minRating) {
+    query.rating = { $gte: parseFloat(filters.minRating) };
+  }
+  if (filters.licenseStatus) {
+    query.license_status = new RegExp(filters.licenseStatus, "i");
+  }
+  if (filters.operatorType) {
+    // Add operator type matching logic if needed
+    const licenseTypeRegex = new RegExp(filters.operatorType, "i");
+    query.license_type = licenseTypeRegex;
+  }
+  if (filters.medical !== undefined) {
+    query.license_type = new RegExp("medical", "i");
+  }
+
+  console.log(`Direct filter query built:`, JSON.stringify(query));
+  return query;
+}
+
 // --- Haversine Distance (meters) ---
 function haversineDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3;
@@ -231,7 +286,7 @@ function buildKeywordQuery(keyword, filters) {
 
   // Add base filters
   if (filters.country) {
-    // ⭐ ADD THIS
+    // ADD THIS
     searchConditions.push({ country_code: new RegExp(filters.country, "i") });
   }
   if (filters.smokeShop !== undefined) {
@@ -397,7 +452,7 @@ function formatShopData(record, userLat = null, userLng = null) {
     dba: record.dba,
     type: record.type,
     subtypes: record.subtypes || [],
-    types: record.subtypes || [], // ⭐ BACKWARD COMPATIBLE (old name)
+    types: record.subtypes || [], // BACKWARD COMPATIBLE (old name)
     category: record.category,
 
     // Location
@@ -441,20 +496,20 @@ function formatShopData(record, userLat = null, userLng = null) {
     // Reviews & Ratings
     rating: record.rating,
     reviews: record.reviews,
-    user_ratings_total: record.reviews, // ⭐ BACKWARD COMPATIBLE (old name)
+    user_ratings_total: record.reviews, // BACKWARD COMPATIBLE (old name)
     reviews_link: record.reviews_link,
     reviews_per_score: record.reviews_per_score,
     reviews_tags: record.reviews_tags || [],
 
     // Photos - WITH BACKWARD COMPATIBILITY
     photo: record.photo,
-    photo_url: record.photo, // ⭐ BACKWARD COMPATIBLE (old name)
+    photo_url: record.photo, // BACKWARD COMPATIBLE (old name)
     street_view: record.street_view,
     photos_count: record.photos_count,
     photos: record.photo
       ? [
           {
-            // ⭐ BACKWARD COMPATIBLE (old format)
+            // BACKWARD COMPATIBLE (old format)
             photo_url: record.photo,
             photo_reference: null,
             height: null,
@@ -486,7 +541,7 @@ function formatShopData(record, userLat = null, userLng = null) {
         : record.range.includes("$$")
           ? 2
           : 1
-      : null, // ⭐ BACKWARD COMPATIBLE
+      : null, // BACKWARD COMPATIBLE
     description: record.description,
     posts: record.posts,
     verified: record.verified || false,
@@ -513,10 +568,10 @@ function formatShopData(record, userLat = null, userLng = null) {
     claimed: record.claimed || false,
     featured: record.featured || false,
     adminVerificationRequired: record.adminVerificationRequired || false,
-    isMatched: record.canojaVerified || false, // ⭐ BACKWARD COMPATIBLE
+    isMatched: record.canojaVerified || false, // BACKWARD COMPATIBLE
     matchedLicense: record.canojaVerified
       ? {
-          // ⭐ BACKWARD COMPATIBLE
+          // BACKWARD COMPATIBLE
           business_name: record.business_name,
           license_number: record.license_number,
           license_status: record.license_status,
@@ -594,29 +649,15 @@ async function geocodeAddress(state, city, zip, country = "US") {
   }
 }
 
-// --- Determine radius based on search specificity ---
-function determineRadius(state, city, zipCode, providedRadius, country) {
-  if (providedRadius && providedRadius !== 5000) {
+// --- Determine radius for zip code geocoding ---
+function determineRadius(providedRadius) {
+  if (providedRadius) {
     console.log(`Using provided radius: ${providedRadius}m`);
     return parseInt(providedRadius);
   }
 
-  if (state && city && zipCode) {
-    console.log(`State + City + ZIP provided, using 6km radius`);
-    return 6000;
-  } else if (state && city) {
-    console.log(`State + City provided, using 20km radius`);
-    return 20000;
-  } else if (state) {
-    console.log(`Only State provided, using 100km radius`);
-    return 100000;
-  } else if (country) {
-    console.log(`Only Country provided, using 1000km radius`);
-    return 1000000;
-  } else {
-    console.log(`Using default radius: 5km`);
-    return 5000;
-  }
+  console.log(`Using default radius for zip code: 6km`);
+  return 6000;
 }
 
 // --- MAIN ENDPOINT: Search Shops ---
@@ -672,11 +713,35 @@ async function compareShops(req, res) {
       // ===== LOCATION-BASED SEARCH MODE =====
 
       if (req.body.lat && req.body.lng) {
+        // Direct coordinates provided
         lat = parseFloat(req.body.lat);
         lng = parseFloat(req.body.lng);
         finalRadius = radius ? parseInt(radius) : 5000;
-      } else if (state || city || zipCode || country) {
-        finalRadius = determineRadius(state, city, zipCode, radius, country);
+
+        console.log(
+          `Using provided coordinates: lat=${lat}, lng=${lng}, radius=${finalRadius}m`,
+        );
+        query = buildLocationQuery(lat, lng, finalRadius, filters);
+
+        totalCount = await LicenseRecord.countDocuments(query);
+        const allShopsInRadius = await LicenseRecord.find(query).lean();
+
+        let shopsWithDistance = allShopsInRadius.map((shop) =>
+          formatShopData(shop, lat, lng),
+        );
+
+        shopsWithDistance.sort((a, b) => {
+          if (a.distanceMeters === null) return 1;
+          if (b.distanceMeters === null) return -1;
+          return a.distanceMeters - b.distanceMeters;
+        });
+
+        shopsWithDistance = applySearchFilters(shopsWithDistance, filters);
+        totalCount = shopsWithDistance.length;
+        shops = shopsWithDistance.slice(skip, skip + limitNum);
+      } else if (zipCode || radius) {
+        // Zip code OR radius requires geocoding
+        finalRadius = radius ? parseInt(radius) : 6000;
         const geocodeResult = await geocodeAddress(
           state,
           city,
@@ -687,63 +752,82 @@ async function compareShops(req, res) {
         if (!geocodeResult.success) {
           return res.status(400).json({
             success: false,
-            error: "Failed to geocode address",
+            error: "Failed to geocode address for radius-based search",
           });
         }
 
         lat = geocodeResult.lat;
         lng = geocodeResult.lng;
+
+        console.log(
+          `Geocoded address: lat=${lat}, lng=${lng}, radius=${finalRadius}m`,
+        );
+        query = buildLocationQuery(lat, lng, finalRadius, filters);
+
+        totalCount = await LicenseRecord.countDocuments(query);
+        const allShopsInRadius = await LicenseRecord.find(query).lean();
+
+        let shopsWithDistance = allShopsInRadius.map((shop) =>
+          formatShopData(shop, lat, lng),
+        );
+
+        shopsWithDistance.sort((a, b) => {
+          if (a.distanceMeters === null) return 1;
+          if (b.distanceMeters === null) return -1;
+          return a.distanceMeters - b.distanceMeters;
+        });
+
+        shopsWithDistance = applySearchFilters(shopsWithDistance, filters);
+        totalCount = shopsWithDistance.length;
+        shops = shopsWithDistance.slice(skip, skip + limitNum);
+      } else if (country || state || city) {
+        // NEW: Direct database filtering by country/state/city (no geocoding, no radius)
+        console.log(
+          `Using direct database filtering: country=${country}, state=${state}, city=${city}`,
+        );
+        query = buildDirectFilterQuery(country, state, city, filters);
+
+        // Get all matching shops
+        const allShops = await LicenseRecord.find(query)
+          .sort({ business_name: 1 })
+          .lean();
+
+        console.log(`Found ${allShops.length} shops matching direct filter`);
+
+        // FORMAT EACH SHOP (this adds photo_url, photos array, etc.)
+        let formattedShops = allShops.map((shop) => formatShopData(shop));
+
+        // Apply in-memory filters (openNow, operatorType, etc.)
+        formattedShops = applySearchFilters(formattedShops, filters);
+
+        totalCount = formattedShops.length;
+
+        // Paginate AFTER filtering
+        shops = formattedShops.slice(skip, skip + limitNum);
+
+        console.log(`Shops after filtering: ${totalCount}`);
+        console.log(`Returning ${shops.length} shops for page ${pageNum}`);
       } else {
         return res.status(400).json({
           success: false,
-          error: "Location required for non-keyword searches",
+          error:
+            "Location required: provide lat/lng, zipCode, or country/state/city",
         });
       }
-
-      console.log(
-        `Coordinates: lat=${lat}, lng=${lng}, radius=${finalRadius}m`,
-      );
-
-      query = buildLocationQuery(lat, lng, finalRadius, filters);
-
-      totalCount = await LicenseRecord.countDocuments(query);
-
-      const allShopsInRadius = await LicenseRecord.find(query).lean();
-
-      console.log(
-        `Found ${allShopsInRadius.length} shops within ${finalRadius}m`,
-      );
-
-      let shopsWithDistance = allShopsInRadius.map((shop) =>
-        formatShopData(shop, lat, lng),
-      );
-
-      shopsWithDistance.sort((a, b) => {
-        if (a.distanceMeters === null) return 1;
-        if (b.distanceMeters === null) return -1;
-        return a.distanceMeters - b.distanceMeters;
-      });
-
-      shopsWithDistance = applySearchFilters(shopsWithDistance, filters);
-
-      totalCount = shopsWithDistance.length;
-
-      shops = shopsWithDistance.slice(skip, skip + limitNum);
 
       console.log(`Shops after filtering: ${totalCount}`);
       console.log(`Returning ${shops.length} shops for page ${pageNum}`);
     }
 
+    // IMPORTANT: For keyword search, still need to format
     let formattedShops = isKeywordSearch
       ? shops.map((shop) => formatShopData(shop, lat, lng))
-      : shops;
+      : shops; // Already formatted for location-based searches
 
     if (isKeywordSearch) {
       formattedShops = applySearchFilters(formattedShops, filters);
-      // Recalculate totalCount after filtering for keyword search
       totalCount = formattedShops.length;
     }
-
     const totalPages = Math.ceil(totalCount / limitNum);
     const hasMore = pageNum < totalPages;
 
@@ -1005,4 +1089,5 @@ module.exports = {
   getShopDetails,
   formatShopData,
   applySearchFilters,
+  buildDirectFilterQuery,
 };
