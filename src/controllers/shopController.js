@@ -6,20 +6,35 @@ function buildDirectFilterQuery(country, state, city, filters) {
 
   // Priority: City > State > Country
   if (city) {
-    query.city = new RegExp(`^${city}$`, "i");
+    query.city = {
+      $regex: new RegExp(`^${city}$`, "i"),
+      $ne: null,
+      $exists: true,
+    };
   }
 
   if (state) {
-    query.stateName = new RegExp(`^${state}$`, "i");
+    query.stateName = {
+      $regex: new RegExp(`^${state}$`, "i"),
+      $ne: null,
+      $exists: true,
+    };
   }
 
   if (country) {
-    query.country_code = new RegExp(`^${country}$`, "i");
+    query.country_code = {
+      $regex: new RegExp(`^${country}$`, "i"),
+      $ne: null,
+      $exists: true,
+    };
   }
 
   // Add other filters
   if (filters.smokeShop !== undefined) {
     query.smoke_shop = filters.smokeShop;
+  }
+  if (filters.cannabis !== undefined) {
+    query.smoke_shop = filters.cannabis ? false : true;
   }
   if (filters.canojaVerified !== undefined) {
     query.canojaVerified = filters.canojaVerified;
@@ -232,16 +247,31 @@ function buildLocationQuery(lat, lng, radius, filters) {
 
   // Add filters that can be done at DB level
   if (filters.country) {
-    query.country_code = new RegExp(filters.country, "i");
+    query.country_code = {
+      $regex: new RegExp(`^${filters.country}$`, "i"),
+      $ne: null,
+      $exists: true,
+    };
   }
   if (filters.state) {
-    query.stateName = new RegExp(filters.state, "i");
+    query.stateName = {
+      $regex: new RegExp(`^${filters.state}$`, "i"),
+      $ne: null,
+      $exists: true,
+    };
   }
   if (filters.city) {
-    query.city = new RegExp(filters.city, "i");
+    query.city = {
+      $regex: new RegExp(`^${filters.city}$`, "i"),
+      $ne: null,
+      $exists: true,
+    };
   }
   if (filters.smokeShop !== undefined) {
     query.smoke_shop = filters.smokeShop;
+  }
+  if (filters.cannabis !== undefined) {
+    query.smoke_shop = filters.cannabis ? false : true;
   }
   if (filters.canojaVerified !== undefined) {
     query.canojaVerified = filters.canojaVerified;
@@ -286,17 +316,39 @@ function buildKeywordQuery(keyword, filters) {
 
   // Add base filters
   if (filters.country) {
-    // ADD THIS
-    searchConditions.push({ country_code: new RegExp(filters.country, "i") });
+    searchConditions.push({
+      country_code: {
+        $regex: new RegExp(`^${filters.country}$`, "i"),
+        $ne: null,
+        $exists: true,
+      },
+    });
+  }
+  if (filters.state) {
+    searchConditions.push({
+      stateName: {
+        $regex: new RegExp(`^${filters.state}$`, "i"),
+        $ne: null,
+        $exists: true,
+      },
+    });
+  }
+  if (filters.city) {
+    searchConditions.push({
+      city: {
+        $regex: new RegExp(`^${filters.city}$`, "i"),
+        $ne: null,
+        $exists: true,
+      },
+    });
   }
   if (filters.smokeShop !== undefined) {
     searchConditions.push({ smoke_shop: filters.smokeShop });
   }
-  if (filters.state) {
-    searchConditions.push({ stateName: new RegExp(filters.state, "i") });
-  }
-  if (filters.city) {
-    searchConditions.push({ city: new RegExp(filters.city, "i") });
+  if (filters.cannabis !== undefined) {
+    searchConditions.push({
+      smoke_shop: filters.cannabis ? false : true,
+    });
   }
   if (filters.canojaVerified !== undefined) {
     searchConditions.push({ canojaVerified: filters.canojaVerified });
@@ -676,7 +728,7 @@ async function compareShops(req, res) {
       limit = 10,
     } = req.body;
 
-    const isKeywordSearch = keyword && keyword.trim().length >= 2;
+    const isKeywordSearch = keyword && keyword.trim().length >= 1;
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
@@ -826,7 +878,7 @@ async function compareShops(req, res) {
 
     if (isKeywordSearch) {
       formattedShops = applySearchFilters(formattedShops, filters);
-      totalCount = formattedShops.length;
+      // totalCount = formattedShops.length;
     }
     const totalPages = Math.ceil(totalCount / limitNum);
     const hasMore = pageNum < totalPages;
