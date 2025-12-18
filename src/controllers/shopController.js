@@ -1,5 +1,85 @@
 const LicenseRecord = require("../models/licenseRecord");
 
+// --- Classify cannabis shop as medical or recreational ---
+function classifyCannabisType(shop) {
+  // Only classify if it's actually a cannabis shop (not a smoke shop)
+  if (shop.smoke_shop === true) {
+    return null; // Not a cannabis shop
+  }
+
+  // Combine all searchable fields
+  const searchableText = [
+    shop.business_name,
+    shop.type,
+    shop.category,
+    shop.owner_title,
+    ...(shop.subtypes || []),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  // Medical keywords (priority check first)
+  const medicalKeywords = [
+    "medical",
+    "medicinal",
+    "med card",
+    "cannabis card",
+    "mmj",
+    "medical marijuana",
+    "certification",
+    "doctor",
+    "clinic",
+    "physician",
+    "evaluation",
+    "recommendation",
+    "patient",
+    "prescription",
+    "healthcare",
+    "treatment center",
+  ];
+
+  // Recreational keywords
+  const recreationalKeywords = [
+    "recreational",
+    "adult use",
+    "adult-use",
+    "rec ",
+    "21+",
+    "dispensary",
+    "retail",
+  ];
+
+  // Check for medical indicators
+  const isMedical = medicalKeywords.some((keyword) =>
+    searchableText.includes(keyword),
+  );
+
+  // Check for recreational indicators
+  const isRecreational = recreationalKeywords.some((keyword) =>
+    searchableText.includes(keyword),
+  );
+
+  // Determine classification
+  if (isMedical && isRecreational) {
+    return "both"; // Dual license
+  } else if (isMedical) {
+    return "medical";
+  } else if (isRecreational) {
+    return "recreational";
+  } else {
+    // Default: most cannabis stores without explicit keywords are recreational
+    // unless they have "clinic" or similar in the type
+    if (
+      searchableText.includes("clinic") ||
+      searchableText.includes("treatment")
+    ) {
+      return "medical";
+    }
+    return "recreational"; // Default assumption
+  }
+}
+
 // --- Build MongoDB query for direct country/state/city filtering (NO geocoding) ---
 function buildDirectFilterQuery(country, state, city, filters) {
   const query = {};
@@ -491,6 +571,8 @@ function formatShopData(record, userLat = null, userLng = null) {
 
   const openNowStatus = isShopOpenNow(record);
 
+  const cannabisType = classifyCannabisType(record);
+
   return {
     // IDs
     _id: record._id,
@@ -642,6 +724,7 @@ function formatShopData(record, userLat = null, userLng = null) {
 
     // Classification
     smoke_shop: record.smoke_shop || false,
+    cannabis_type: cannabisType,
 
     // Metadata
     createdAt: record.createdAt,
@@ -898,6 +981,13 @@ async function compareShops(req, res) {
     console.log(`Current page: ${pageNum}/${totalPages}`);
     console.log(`Has more: ${hasMore}`);
 
+    const medicalShops = formattedShops.filter(
+      (s) => s.cannabis_type === "medical",
+    );
+    const recreationalShops = formattedShops.filter(
+      (s) => s.cannabis_type === "recreational",
+    );
+
     res.json({
       success: true,
       data: {
@@ -929,6 +1019,8 @@ async function compareShops(req, res) {
             totalCount > 0
               ? `${((licensedShops.length / totalCount) * 100).toFixed(1)}%`
               : "0%",
+          medical_count: medicalShops.length,
+          recreational_count: recreationalShops.length,
         },
 
         debug: {
@@ -1142,4 +1234,5 @@ module.exports = {
   formatShopData,
   applySearchFilters,
   buildDirectFilterQuery,
+  classifyCannabisType,
 };
