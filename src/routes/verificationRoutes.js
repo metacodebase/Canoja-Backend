@@ -82,10 +82,18 @@ const {
  *         description: Failed to create claim request
  */
 
+// Public claim endpoint (no authentication required)
+// Supports both multipart/form-data (with file uploads) and application/json (without files)
 router.post(
   "/claim",
-  authMiddleware,
-  uploadFields,
+  (req, res, next) => {
+    // Only apply file upload middleware if Content-Type is multipart/form-data
+    if (req.is("multipart/form-data")) {
+      return uploadFields(req, res, next);
+    }
+    // Skip file upload middleware for JSON requests
+    next();
+  },
   verificationController.createClaimRequest,
 );
 

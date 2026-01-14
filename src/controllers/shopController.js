@@ -929,6 +929,16 @@ async function compareShops(req, res) {
 
         console.log(`Found ${allShops.length} shops matching direct filter`);
 
+        // Geocode the location for response display (not for filtering)
+        const geocodeResult = await geocodeAddress(state, city, null, country);
+        if (geocodeResult.success) {
+          lat = geocodeResult.lat;
+          lng = geocodeResult.lng;
+          console.log(`Geocoded location for response: lat=${lat}, lng=${lng}`);
+        } else {
+          console.log(`Could not geocode location for response display`);
+        }
+
         // FORMAT EACH SHOP (this adds photo_url, photos array, etc.)
         let formattedShops = allShops.map((shop) => formatShopData(shop));
 
@@ -987,6 +997,8 @@ async function compareShops(req, res) {
     const recreationalShops = formattedShops.filter(
       (s) => s.cannabis_type === "recreational",
     );
+    const bothShops = formattedShops.filter((s) => s.cannabis_type === "both");
+    const smokeShops = formattedShops.filter((s) => s.smoke_shop === true);
 
     res.json({
       success: true,
@@ -1008,6 +1020,16 @@ async function compareShops(req, res) {
           search_type: isKeywordSearch ? "keyword" : "location",
           keyword: isKeywordSearch ? keyword : null,
           location: !isKeywordSearch ? { lat, lng, radius: finalRadius } : null,
+          geocoded_location:
+            !isKeywordSearch && lat && lng
+              ? {
+                  lat,
+                  lng,
+                  city: city || null,
+                  state: state || null,
+                  country: country || null,
+                }
+              : null,
           filters_applied: filters,
         },
 
@@ -1015,12 +1037,10 @@ async function compareShops(req, res) {
           total_found: totalCount,
           licensed_count: licensedShops.length,
           unlicensed_count: unlicensedShops.length,
-          verification_rate:
-            totalCount > 0
-              ? `${((licensedShops.length / totalCount) * 100).toFixed(1)}%`
-              : "0%",
           medical_count: medicalShops.length,
           recreational_count: recreationalShops.length,
+          both_count: bothShops.length,
+          smoke_shop_count: smokeShops.length,
         },
 
         debug: {

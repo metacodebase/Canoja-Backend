@@ -4,7 +4,7 @@ const verificationRequestSchema = new mongoose.Schema(
   {
     pharmacyId: {
       type: String, // Can store both ObjectId strings and Google place_id strings
-      required: true,
+      required: false, // Optional - can be null for manual verification requests
     },
     status: {
       type: String,
@@ -30,6 +30,23 @@ const verificationRequestSchema = new mongoose.Schema(
     },
     notes: {
       type: String,
+    },
+
+    // Business Type and Verification Method
+    business_type: {
+      type: String,
+      enum: ["smoke_shop", "cannabis_operator"],
+    },
+    verification_method: {
+      type: String,
+      enum: ["auto", "manual"],
+    },
+    verification_email_sent: {
+      type: Boolean,
+      default: false,
+    },
+    verification_email_sent_at: {
+      type: Date,
     },
 
     legal_business_name: {
@@ -73,7 +90,8 @@ const verificationRequestSchema = new mongoose.Schema(
     license_information: {
       license_number: {
         type: String,
-        required: true,
+        required: false, // Optional - can be empty for manual verification
+        default: "",
       },
       issuing_authority: {
         type: String,
