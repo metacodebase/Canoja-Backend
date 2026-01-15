@@ -297,9 +297,72 @@ const sendRejectionEmail = async (toEmail, businessName, reason = null) => {
   }
 };
 
+/**
+ * Send password reset OTP email
+ * @param {string} toEmail - User email address
+ * @param {string} otp - One-time password (6 digits)
+ * @returns {Promise<Object>} Email send result
+ */
+const sendPasswordResetOTP = async (toEmail, otp) => {
+  try {
+    const transporter = createTransporter();
+    if (!transporter) {
+      console.log("Email service not configured. Skipping OTP email.");
+      return { success: false, message: "Email service not configured" };
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: toEmail,
+      subject: "Canoja - Password Reset OTP",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #10b981;">Password Reset Request</h2>
+          <p>Hello,</p>
+          <p>You have requested to reset your password for your Canoja account.</p>
+          <div style="background-color: #f3f4f6; padding: 24px; border-radius: 8px; margin: 24px 0; text-align: center;">
+            <p style="margin: 0 0 12px 0; color: #64748b; font-size: 14px;">Your OTP code is:</p>
+            <h1 style="margin: 0; color: #10b981; font-size: 36px; letter-spacing: 8px; font-weight: 700;">${otp}</h1>
+            <p style="margin: 12px 0 0 0; color: #dc2626; font-size: 12px;">This code will expire in 10 minutes.</p>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">If you did not request this password reset, please ignore this email or contact our support team.</p>
+          <p>Best regards,<br>The Canoja Team</p>
+        </div>
+      `,
+      text: `
+        Password Reset Request
+        
+        Hello,
+        
+        You have requested to reset your password for your Canoja account.
+        
+        Your OTP code is: ${otp}
+        
+        This code will expire in 10 minutes.
+        
+        If you did not request this password reset, please ignore this email or contact our support team.
+        
+        Best regards,
+        The Canoja Team
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Password reset OTP email sent:", info.messageId);
+    return {
+      success: true,
+      messageId: info.messageId,
+    };
+  } catch (error) {
+    console.error("Error sending password reset OTP email:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendVerificationEmail,
   sendPendingReviewEmail,
   sendApprovalEmail,
   sendRejectionEmail,
+  sendPasswordResetOTP,
 };

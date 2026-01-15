@@ -1,6 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const userController = require("../controllers/userController");
+const {
+  registerUser,
+  loginUser,
+  changePassword,
+  requestPasswordReset,
+  verifyOTP,
+  verifyOTPAndResetPassword,
+} = require("../controllers/userController");
+const { authMiddleware } = require("../middleware/authMiddleware");
 
 /**
  * @swagger
@@ -64,7 +72,7 @@ const userController = require("../controllers/userController");
  *       500:
  *         description: Failed to register user
  */
-router.post("/register", userController.registerUser);
+router.post("/register", registerUser);
 
 /**
  * @swagger
@@ -124,6 +132,49 @@ router.post("/register", userController.registerUser);
  *       500:
  *         description: Failed to login
  */
-router.post("/login", userController.loginUser);
+router.post("/login", loginUser);
+
+/**
+ * @swagger
+ * /api/users/change-password:
+ *   post:
+ *     summary: Change user password
+ *     description: Allows authenticated users to change their password by providing current and new password.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 example: "oldpassword123"
+ *               newPassword:
+ *                 type: string
+ *                 example: "newpassword123"
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Invalid input or password too short
+ *       401:
+ *         description: Current password is incorrect or unauthorized
+ *       500:
+ *         description: Failed to change password
+ */
+router.post("/change-password", authMiddleware, changePassword);
+
+// Forgot password routes (public - no authentication required)
+router.post("/forgot-password", requestPasswordReset);
+router.post("/verify-otp", verifyOTP);
+router.post("/reset-password", verifyOTPAndResetPassword);
 
 module.exports = router;

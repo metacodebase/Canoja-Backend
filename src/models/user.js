@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema(
         ref: "LicenseRecord",
       },
     ],
+    requiresPasswordChange: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );

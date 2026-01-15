@@ -56,6 +56,7 @@ const autoRegisterUser = async (email, password, licenseRecordId = null) => {
     password: hashedPassword,
     role: "operator",
     licenseRecords: licenseRecordId ? [licenseRecordId] : [],
+    requiresPasswordChange: true, // New users must change password on first login
   });
 
   await user.save();
