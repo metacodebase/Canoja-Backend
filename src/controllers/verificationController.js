@@ -33,18 +33,16 @@ const generateDummyPassword = () => {
  * @returns {Promise<Object>} Created user object and whether user was newly created
  */
 const autoRegisterUser = async (email, password, licenseRecordId = null) => {
-  // Check if user already exists
+  // Check if user already exists. If yes, we don't want to reuse the account
+  // for another claim – each email can only be associated with one claimed
+  // record for now.
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    // If user exists, update role and add license record if provided
-    if (licenseRecordId) {
-      existingUser.role = "operator";
-      existingUser.licenseRecords = [
-        ...new Set([...existingUser.licenseRecords, licenseRecordId]),
-      ];
-      await existingUser.save();
-    }
-    return { user: existingUser, isNewUser: false };
+    const error = new Error(
+      "This email is already associated with a claimed business. Please use a different email address.",
+    );
+    error.code = "EMAIL_ALREADY_ASSOCIATED";
+    throw error;
   }
 
   // Hash password
@@ -165,11 +163,24 @@ const createClaimRequest = async (req, res) => {
     if (isSmokeShopBusiness) {
       // Generate dummy password and auto-register user
       const dummyPassword = generateDummyPassword();
-      const { user, isNewUser } = await autoRegisterUser(
-        parsedContactPerson.email_address,
-        dummyPassword,
-        matchedRecord._id,
-      );
+      let user;
+      let isNewUser;
+      try {
+        ({ user, isNewUser } = await autoRegisterUser(
+          parsedContactPerson.email_address,
+          dummyPassword,
+          matchedRecord._id,
+        ));
+      } catch (error) {
+        if (error.code === "EMAIL_ALREADY_ASSOCIATED") {
+          return res.status(400).json({
+            success: false,
+            error:
+              "This email is already associated with another claimed business. Please use a different email address.",
+          });
+        }
+        throw error;
+      }
 
       // Update LicenseRecord (don't set canojaVerified if shop is not already verified)
       const updateFields = {
@@ -250,11 +261,24 @@ const createClaimRequest = async (req, res) => {
 
       // Generate dummy password and auto-register user
       const dummyPassword = generateDummyPassword();
-      const { user, isNewUser } = await autoRegisterUser(
-        parsedContactPerson.email_address,
-        dummyPassword,
-        matchedRecord._id,
-      );
+      let user;
+      let isNewUser;
+      try {
+        ({ user, isNewUser } = await autoRegisterUser(
+          parsedContactPerson.email_address,
+          dummyPassword,
+          matchedRecord._id,
+        ));
+      } catch (error) {
+        if (error.code === "EMAIL_ALREADY_ASSOCIATED") {
+          return res.status(400).json({
+            success: false,
+            error:
+              "This email is already associated with another claimed business. Please use a different email address.",
+          });
+        }
+        throw error;
+      }
 
       // Update LicenseRecord (don't set canojaVerified if shop is not already verified)
       const updateFields = {
@@ -560,11 +584,24 @@ const approveRequest = async (req, res) => {
 
     // Generate dummy password and auto-register user
     const dummyPassword = generateDummyPassword();
-    const { user, isNewUser } = await autoRegisterUser(
-      request.contact_person.email_address,
-      dummyPassword,
-      licenseRecordId,
-    );
+    let user;
+    let isNewUser;
+    try {
+      ({ user, isNewUser } = await autoRegisterUser(
+        request.contact_person.email_address,
+        dummyPassword,
+        licenseRecordId,
+      ));
+    } catch (error) {
+      if (error.code === "EMAIL_ALREADY_ASSOCIATED") {
+        return res.status(400).json({
+          success: false,
+          error:
+            "This email is already associated with another claimed business. Please use a different email address.",
+        });
+      }
+      throw error;
+    }
 
     // Handle LicenseRecord update if found
     if (licenseRecord) {

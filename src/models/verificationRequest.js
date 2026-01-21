@@ -95,19 +95,19 @@ const verificationRequestSchema = new mongoose.Schema(
       },
       issuing_authority: {
         type: String,
-        required: true,
+        required: false, // Optional - user might not have full license details
       },
       license_type: {
         type: String,
-        required: true,
+        required: false, // Optional - user might not have full license details
       },
       expiration_date: {
         type: Date,
-        required: true,
+        required: false, // Optional - user might not have full license details
       },
       jurisdiction: {
         type: String,
-        required: true,
+        required: false, // Optional - user might not have full license details
       },
     },
 
