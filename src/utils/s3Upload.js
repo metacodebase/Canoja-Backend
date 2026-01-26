@@ -24,11 +24,22 @@ const upload = multer({
     },
   }),
   fileFilter: function (req, file, cb) {
-    const allowedTypes = /jpeg|jpg|png|pdf|doc|docx/;
-    const extname = allowedTypes.test(
-      path.extname(file.originalname).toLowerCase(),
-    );
-    const mimetype = allowedTypes.test(file.mimetype);
+    // Allowed file extensions
+    const allowedExtensions = /\.(jpeg|jpg|png|pdf|doc|docx)$/i;
+    const extname = allowedExtensions.test(file.originalname);
+
+    // Allowed MIME types
+    const allowedMimeTypes = [
+      // Images
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      // Documents
+      "application/pdf",
+      "application/msword", // .doc files
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx files
+    ];
+    const mimetype = allowedMimeTypes.includes(file.mimetype);
 
     if (mimetype && extname) {
       return cb(null, true);
