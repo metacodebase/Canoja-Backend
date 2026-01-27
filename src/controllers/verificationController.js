@@ -77,6 +77,7 @@ const createClaimRequest = async (req, res) => {
       contact_person,
       license_information,
       gps_coordinates,
+      pharmacyId,
     } = req.body;
 
     // userId is optional (public form, user may not be logged in)
@@ -116,20 +117,64 @@ const createClaimRequest = async (req, res) => {
       });
     }
 
-    // Step 1: Match by business name (case-insensitive)
-    const businessName = legal_business_name.trim();
-    const matchedRecord = await LicenseRecord.findOne({
-      $or: [
-        { business_name: { $regex: new RegExp(`^${businessName}$`, "i") } },
-        { dba: { $regex: new RegExp(`^${businessName}$`, "i") } },
-      ],
-    });
+    // Global email check: prevent the same email from being used to claim
+    // multiple businesses (applies to BOTH auto-verification and manual
+    // verification flows). We do this early so the user gets immediate
+    // feedback and we don't create VerificationRequest records that can
+    // never be approved.
+    if (parsedContactPerson.email_address) {
+      const existingUserForEmail = await User.findOne({
+        email: parsedContactPerson.email_address,
+      });
+
+      if (existingUserForEmail) {
+        return res.status(400).json({
+          success: false,
+          error:
+            "This email is already associated with another claimed business. Please use a different email address.",
+        });
+      }
+    }
+
+    // Step 1: Find the matching LicenseRecord
+    // Prefer pharmacyId (exact ID match) if provided, otherwise fall back to
+    // matching by business name / DBA (previous behaviour).
+    let matchedRecord;
+
+    if (pharmacyId) {
+      try {
+        matchedRecord = await LicenseRecord.findById(pharmacyId);
+      } catch (e) {
+        // Invalid ObjectId format
+        return res.status(400).json({
+          success: false,
+          error: "Invalid pharmacyId provided.",
+        });
+      }
+    } else {
+      const businessName = legal_business_name.trim();
+      matchedRecord = await LicenseRecord.findOne({
+        $or: [
+          { business_name: { $regex: new RegExp(`^${businessName}$`, "i") } },
+          { dba: { $regex: new RegExp(`^${businessName}$`, "i") } },
+        ],
+      });
+    }
 
     if (!matchedRecord) {
-      return res.status(404).json({
-        success: false,
-        error: "Business not found in our database. Please contact support.",
-      });
+      return res.status(404).json(
+        pharmacyId
+          ? {
+              success: false,
+              error:
+                "Business not found for the provided pharmacyId. Please contact support.",
+            }
+          : {
+              success: false,
+              error:
+                "Business not found in our database. Please contact support.",
+            },
+      );
     }
 
     console.log(
