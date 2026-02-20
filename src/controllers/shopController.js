@@ -231,6 +231,33 @@ function applySearchFilters(shops, filters) {
       if (!licenseType.includes("medical")) return false;
     }
 
+    // Cannabis Type filter - supports single value or array
+    if (filters.cannabisType !== undefined) {
+      const shopCannabisType = shop.cannabis_type;
+
+      // If shop has no cannabis_type (e.g., smoke shop), exclude it
+      if (!shopCannabisType) {
+        return false;
+      }
+
+      // Handle array of types
+      if (Array.isArray(filters.cannabisType)) {
+        const normalizedTypes = filters.cannabisType.map((t) =>
+          t?.toLowerCase(),
+        );
+        if (!normalizedTypes.includes(shopCannabisType?.toLowerCase())) {
+          return false;
+        }
+      } else {
+        // Handle single type
+        const filterType = filters.cannabisType?.toLowerCase();
+        const shopType = shopCannabisType?.toLowerCase();
+        if (filterType !== shopType) {
+          return false;
+        }
+      }
+    }
+
     // Smoke Shop filter
     if (filters.smokeShop) {
       if (!shop.smoke_shop) return false;

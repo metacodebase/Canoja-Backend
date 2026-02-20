@@ -401,8 +401,11 @@ const createClaimRequest = async (req, res) => {
 
     // Step 5: Create manual verification request for admin approval
     if (needsAdminApproval) {
+      // Use the matched record's business name for logging to avoid referencing
+      // an out-of-scope variable (businessName was only defined in the fallback
+      // branch when pharmacyId was not provided).
       console.log(
-        `No license number match. Creating manual verification request for ${businessName}`,
+        `No license number match. Creating manual verification request for ${matchedRecord.business_name}`,
       );
 
       // Check for existing pending claim for this business (by license record ID)
