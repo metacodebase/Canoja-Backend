@@ -33,6 +33,7 @@ const {
  *               - business_phone_number
  *               - contact_person
  *               - license_information
+ *               - ownership_attestation
  *             properties:
  *               pharmacyId:
  *                 type: string
@@ -73,6 +74,10 @@ const {
  *                 type: string
  *                 format: binary
  *                 description: Upload PDF/DOC/Image for government-issued ID
+ *               ownership_attestation:
+ *                 type: boolean
+ *                 description: Legal attestation that the user has rights to claim this business. Must be true to submit.
+ *                 example: true
  *     responses:
  *       200:
  *         description: Claim request submitted successfully

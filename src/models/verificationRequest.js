@@ -131,6 +131,16 @@ const verificationRequestSchema = new mongoose.Schema(
       longitude: Number,
     },
 
+    // Ownership Attestation (Legal Protection)
+    ownership_attestation: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    ownership_attestation_timestamp: {
+      type: Date,
+    },
+
     // Submission metadata
     verification_metadata: {
       ip_address: String,

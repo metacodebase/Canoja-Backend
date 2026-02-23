@@ -78,6 +78,7 @@ const createClaimRequest = async (req, res) => {
       license_information,
       gps_coordinates,
       pharmacyId,
+      ownership_attestation,
     } = req.body;
 
     // userId is optional (public form, user may not be logged in)
@@ -114,6 +115,19 @@ const createClaimRequest = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Missing required fields",
+      });
+    }
+
+    // Validate ownership attestation (legal protection)
+    // Must be explicitly true (not just truthy)
+    // Handle both boolean true (from JSON) and string "true" (from FormData)
+    const isAttestationValid =
+      ownership_attestation === true || ownership_attestation === "true";
+    if (!isAttestationValid) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "Ownership attestation is required. You must confirm that you legally have rights to claim this business.",
       });
     }
 
@@ -505,6 +519,11 @@ const createClaimRequest = async (req, res) => {
             ? JSON.parse(gps_coordinates)
             : gps_coordinates
           : {},
+
+        // Ownership Attestation (Legal Protection)
+        ownership_attestation:
+          ownership_attestation === true || ownership_attestation === "true",
+        ownership_attestation_timestamp: new Date(),
 
         // Submission metadata
         verification_metadata: {
