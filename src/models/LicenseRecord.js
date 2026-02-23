@@ -145,6 +145,11 @@ const licenseRecordSchema = new mongoose.Schema(
 
     // Classification
     smoke_shop: { type: Boolean, default: false, index: true },
+
+    // Business Management
+    visibility: { type: Boolean, default: true, index: true }, // User can hide/show shop
+    menu: String, // URL to menu file (PDF or image)
+    view_count: { type: Number, default: 0 }, // Track engagement - number of views/clicks
   },
   {
     timestamps: true,
