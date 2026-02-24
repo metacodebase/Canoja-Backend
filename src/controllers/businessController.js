@@ -87,6 +87,7 @@ async function getBusinessDashboard(req, res) {
       },
       business_id: business._id,
       business_name: business.business_name,
+      menu_url: business.menu || null,
     };
 
     res.json({
@@ -259,7 +260,8 @@ async function updateBusinessProfile(req, res) {
       updateFields["contact_information.phone"] = phone;
       updateFields.business_phone_number = phone;
     }
-    if (email !== undefined) updateFields["contact_information.email"] = email;
+    // Email cannot be updated through this endpoint for security reasons
+    // if (email !== undefined) updateFields["contact_information.email"] = email;
     if (website !== undefined) {
       updateFields["contact_information.website"] = website;
       updateFields.website_or_social_media_link = website;

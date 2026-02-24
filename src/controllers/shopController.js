@@ -146,6 +146,10 @@ function buildDirectFilterQuery(country, state, city, filters) {
     query.license_type = new RegExp("medical", "i");
   }
 
+  // Only return shops with visibility: true (or undefined, which defaults to true)
+  // visibility !== false means: true or undefined/null
+  query.visibility = { $ne: false };
+
   console.log(`Direct filter query built:`, JSON.stringify(query));
   return query;
 }
@@ -399,6 +403,10 @@ function buildLocationQuery(lat, lng, radius, filters) {
     query.rating = { $gte: parseFloat(filters.minRating) };
   }
 
+  // Only return shops with visibility: true (or undefined, which defaults to true)
+  // visibility !== false means: true or undefined/null
+  query.visibility = { $ne: false };
+
   return query;
 }
 
@@ -477,6 +485,10 @@ function buildKeywordQuery(keyword, filters) {
   if (filters.minRating) {
     searchConditions.push({ rating: { $gte: parseFloat(filters.minRating) } });
   }
+
+  // Only return shops with visibility: true (or undefined, which defaults to true)
+  // visibility !== false means: true or undefined/null
+  searchConditions.push({ visibility: { $ne: false } });
 
   return searchConditions.length > 0 ? { $and: searchConditions } : {};
 }
