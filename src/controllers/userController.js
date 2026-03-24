@@ -4,6 +4,21 @@ const User = require("../models/user");
 const PasswordResetOTP = require("../models/passwordResetOTP");
 const { sendPasswordResetOTP } = require("../utils/emailService");
 
+// Token Generation Utilities
+// Generate access token (30 days expiration)
+const generateAccessToken = (userId, email, role) => {
+  return jwt.sign({ userId, email, role }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
+
+// Generate refresh token (60 days expiration)
+const generateRefreshToken = (userId) => {
+  return jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "60d",
+  });
+};
+
 // Register user
 const registerUser = async (req, res) => {
   try {
@@ -30,17 +45,22 @@ const registerUser = async (req, res) => {
 
     await user.save();
 
-    // Generate JWT token (include role in token)
-    const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+    // Generate access and refresh tokens
+    const accessToken = generateAccessToken(user._id, user.email, user.role);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // Save refresh token to database
+    user.refreshToken = refreshToken;
+    user.refreshTokenExpiresAt = new Date(
+      Date.now() + 60 * 24 * 60 * 60 * 1000,
+    ); // 60 days
+    await user.save();
 
     res.status(201).json({
       success: true,
       message: "User registered successfully",
-      token,
+      token: accessToken,
+      refreshToken: refreshToken,
       user: {
         id: user._id,
         name: user.name,
@@ -80,17 +100,22 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Generate JWT token (include role in token)
-    const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+    // Generate access and refresh tokens
+    const accessToken = generateAccessToken(user._id, user.email, user.role);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // Save refresh token to database
+    user.refreshToken = refreshToken;
+    user.refreshTokenExpiresAt = new Date(
+      Date.now() + 60 * 24 * 60 * 60 * 1000,
+    ); // 60 days
+    await user.save();
 
     res.json({
       success: true,
       message: "Login successful",
-      token,
+      token: accessToken,
+      refreshToken: refreshToken,
       user: {
         id: user._id,
         name: user.name,
@@ -377,6 +402,104 @@ const verifyOTPAndResetPassword = async (req, res) => {
   }
 };
 
+// Refresh access token
+const refreshAccessToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        error: "Refresh token is required",
+      });
+    }
+
+    // Verify refresh token signature
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid or expired refresh token",
+      });
+    }
+
+    // Find user and validate stored refresh token
+    const user = await User.findById(decoded.userId);
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid refresh token",
+      });
+    }
+
+    // Check if refresh token is expired
+    if (user.refreshTokenExpiresAt < new Date()) {
+      return res.status(401).json({
+        success: false,
+        error: "Refresh token has expired",
+      });
+    }
+
+    // Generate new access token
+    const newAccessToken = generateAccessToken(user._id, user.email, user.role);
+
+    // Generate NEW refresh token (rotating refresh tokens)
+    const newRefreshToken = generateRefreshToken(user._id);
+
+    // Update database with new refresh token and expiry
+    user.refreshToken = newRefreshToken;
+    user.refreshTokenExpiresAt = new Date(
+      Date.now() + 60 * 24 * 60 * 60 * 1000,
+    ); // 60 days
+    await user.save();
+
+    res.json({
+      success: true,
+      token: newAccessToken,
+      refreshToken: newRefreshToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        requiresPasswordChange: user.requiresPasswordChange || false,
+      },
+    });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to refresh token",
+    });
+  }
+};
+
+// Logout user
+const logoutUser = async (req, res) => {
+  try {
+    const userId = req.user.id || req.user._id;
+
+    // Clear refresh token from database
+    await User.findByIdAndUpdate(userId, {
+      refreshToken: null,
+      refreshTokenExpiresAt: null,
+    });
+
+    res.json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to logout",
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -384,4 +507,6 @@ module.exports = {
   requestPasswordReset,
   verifyOTP,
   verifyOTPAndResetPassword,
+  refreshAccessToken,
+  logoutUser,
 };

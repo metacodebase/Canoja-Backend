@@ -7,6 +7,8 @@ const {
   requestPasswordReset,
   verifyOTP,
   verifyOTPAndResetPassword,
+  refreshAccessToken,
+  logoutUser,
 } = require("../controllers/userController");
 const { authMiddleware } = require("../middleware/authMiddleware");
 
@@ -176,5 +178,11 @@ router.post("/change-password", authMiddleware, changePassword);
 router.post("/forgot-password", requestPasswordReset);
 router.post("/verify-otp", verifyOTP);
 router.post("/reset-password", verifyOTPAndResetPassword);
+
+// Refresh token route (public - no auth required)
+router.post("/refresh-token", refreshAccessToken);
+
+// Logout route (requires authentication)
+router.post("/logout", authMiddleware, logoutUser);
 
 module.exports = router;
