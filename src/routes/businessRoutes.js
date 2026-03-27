@@ -57,6 +57,13 @@ const menuUpload = multer({
   },
 });
 
+/**
+ * @route   POST /api/business/:businessId/view
+ * @desc    Record a profile view (anonymous, one per device per business forever)
+ * @access  Public
+ */
+router.post("/:businessId/view", businessController.recordView);
+
 // All routes require authentication
 router.use(authMiddleware);
 

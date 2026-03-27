@@ -1,5 +1,6 @@
 const LicenseRecord = require("../models/licenseRecord");
 const VerificationRequest = require("../models/verificationRequest");
+const BusinessView = require("../models/businessView");
 const { uploadToS3 } = require("../utils/s3Upload");
 
 // --- Get Business Dashboard Data ---
@@ -438,6 +439,43 @@ async function getEngagementStats(req, res) {
   }
 }
 
+// --- Record a profile view (anonymous, one per device per business forever) ---
+async function recordView(req, res) {
+  try {
+    const { businessId } = req.params;
+    const { device_id } = req.body;
+
+    if (!businessId || !device_id) {
+      return res.status(400).json({
+        success: false,
+        message: "business_id and device_id are required",
+      });
+    }
+
+    // insertOne with unique index — if already exists, duplicate key error is thrown and caught
+    await BusinessView.create({ business_id: businessId, device_id });
+
+    // Only reaches here if it's a new view — increment count
+    await LicenseRecord.findByIdAndUpdate(businessId, {
+      $inc: { view_count: 1 },
+    });
+
+    console.log(
+      `✅ View recorded — business: ${businessId}, device: ${device_id}`,
+    );
+    return res.status(201).json({ success: true, message: "View recorded" });
+  } catch (error) {
+    if (error.code === 11000) {
+      // Duplicate key — device already viewed this business, silently ignore
+      return res.status(200).json({ success: true, message: "Already viewed" });
+    }
+    console.error("❌ Error recording view:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to record view" });
+  }
+}
+
 module.exports = {
   getBusinessDashboard,
   getBusinessLocation,
@@ -446,4 +484,5 @@ module.exports = {
   toggleBusinessVisibility,
   uploadMenu,
   getEngagementStats,
+  recordView,
 };
