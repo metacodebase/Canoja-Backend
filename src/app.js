@@ -12,6 +12,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
 const verificationRoutes = require("./routes/verificationRoutes");
 const businessRoutes = require("./routes/businessRoutes");
+const ageVerificationRoutes = require("./routes/ageVerificationRoutes");
 
 const { swaggerUi, swaggerSpec } = require("./swagger");
 
@@ -38,6 +39,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/verification-requests", verificationRoutes);
 app.use("/api/business", businessRoutes);
+app.use("/api/age-verification", ageVerificationRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
