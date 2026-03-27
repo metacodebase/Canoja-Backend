@@ -17,6 +17,7 @@ const ageVerificationRoutes = require("./routes/ageVerificationRoutes");
 const { swaggerUi, swaggerSpec } = require("./swagger");
 
 const app = express();
+app.set("trust proxy", true);
 
 const corsOptions = {
   origin: ["http://54.227.140.191:5173", "http://localhost:5173"], // frontend origin
