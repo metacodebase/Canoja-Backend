@@ -48,6 +48,16 @@ const sendVerificationEmail = async (
             <p style="color: #dc2626; font-size: 14px; margin-top: 15px;"><strong>⚠️ Important:</strong> Please change this password after your first login for security.</p>
           </div>
           <p>You can now log in to your Canoja account and proceed to purchase a subscription plan.</p>
+          <div style="text-align: center; margin: 24px 0;">
+            <a href="canoja://change-password?email=${encodeURIComponent(toEmail)}&password=${encodeURIComponent(password)}"
+               style="background-color: #10b981; color: #ffffff; padding: 12px 28px;
+                      border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
+              Change Password
+            </a>
+          </div>
+          <p style="font-size: 12px; color: #6b7280; text-align: center;">
+            Tap the button above to open the Canoja app and change your password. Make sure the app is installed on your device.
+          </p>
         `
       : `
           <div style="background-color: #eff6ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -186,6 +196,16 @@ const sendApprovalEmail = async (toEmail, businessName, password = null) => {
             <p style="color: #dc2626; font-size: 14px; margin-top: 15px;"><strong>⚠️ Important:</strong> Please change this password after your first login for security.</p>
           </div>
           <p>You can now log in to your Canoja account and proceed to purchase a subscription plan.</p>
+          <div style="text-align: center; margin: 24px 0;">
+            <a href="canoja://change-password?email=${encodeURIComponent(toEmail)}&password=${encodeURIComponent(password)}"
+               style="background-color: #10b981; color: #ffffff; padding: 12px 28px;
+                      border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
+              Change Password
+            </a>
+          </div>
+          <p style="font-size: 12px; color: #6b7280; text-align: center;">
+            Tap the button above to open the Canoja app and change your password. Make sure the app is installed on your device.
+          </p>
         `
       : `
           <div style="background-color: #eff6ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
