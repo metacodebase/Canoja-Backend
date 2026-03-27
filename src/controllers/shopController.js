@@ -80,6 +80,42 @@ function classifyCannabisType(shop) {
   }
 }
 
+function extractServices(record) {
+  const services = [];
+
+  // Parse about if it's a string
+  let about = record.about;
+  if (typeof about === "string") {
+    try {
+      about = JSON.parse(about);
+    } catch (e) {
+      about = {};
+    }
+  }
+
+  // 1. From subtypes
+  if (record.subtypes) {
+    const subtypeList = Array.isArray(record.subtypes)
+      ? record.subtypes
+      : record.subtypes.split(",").map((s) => s.trim());
+    services.push(...subtypeList);
+  }
+
+  // 2. From about → Service options
+  const serviceOptions = about?.["Service options"] || {};
+  Object.entries(serviceOptions).forEach(([key, val]) => {
+    if (val === true) services.push(key);
+  });
+
+  // 3. From about → Amenities
+  const amenities = about?.["Amenities"] || {};
+  Object.entries(amenities).forEach(([key, val]) => {
+    if (val === true) services.push(key);
+  });
+
+  return [...new Set(services)];
+}
+
 // --- Build MongoDB query for direct country/state/city filtering (NO geocoding) ---
 function buildDirectFilterQuery(country, state, city, filters) {
   const query = {};
@@ -707,6 +743,7 @@ function formatShopData(record, userLat = null, userLng = null) {
 
     // Business Details
     about: record.about,
+    services: extractServices(record),
     range: record.range,
     price_level: record.range
       ? record.range.includes("$$$")
