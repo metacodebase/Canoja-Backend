@@ -149,6 +149,7 @@ const licenseRecordSchema = new mongoose.Schema(
     // Business Management
     visibility: { type: Boolean, default: true, index: true }, // User can hide/show shop
     menu: String, // URL to menu file (PDF or image)
+    menuUploadedAt: { type: Date, default: null },
     view_count: { type: Number, default: 0 }, // Track engagement - number of views/clicks
   },
   {

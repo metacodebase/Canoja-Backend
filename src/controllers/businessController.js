@@ -79,6 +79,7 @@ async function getBusinessDashboard(req, res) {
         menu_freshness: {
           status: menuStatus,
           message: menuMessage,
+          uploaded_at: business.menuUploadedAt || null,
         },
         engagement: {
           count: engagementCount,
@@ -379,6 +380,7 @@ async function uploadMenu(req, res) {
     const menuUrl = req.file.location;
 
     business.menu = menuUrl;
+    business.menuUploadedAt = new Date();
     await business.save();
 
     res.json({
