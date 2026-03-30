@@ -10,6 +10,9 @@ const {
   refreshAccessToken,
   logoutUser,
 } = require("../controllers/userController");
+const {
+  handleChangePasswordDeepLink,
+} = require("../controllers/deepLinkController");
 const { authMiddleware } = require("../middleware/authMiddleware");
 
 /**
@@ -173,6 +176,9 @@ router.post("/login", loginUser);
  *         description: Failed to change password
  */
 router.post("/change-password", authMiddleware, changePassword);
+
+// Deep link redirect route (public - opens app or falls back to TestFlight)
+router.get("/deeplink/change-password", handleChangePasswordDeepLink);
 
 // Forgot password routes (public - no authentication required)
 router.post("/forgot-password", requestPasswordReset);

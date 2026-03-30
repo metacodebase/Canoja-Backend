@@ -1,5 +1,8 @@
 const nodemailer = require("nodemailer");
 
+const BACKEND_BASE_URL =
+  process.env.BACKEND_BASE_URL || "http://54.227.140.191";
+
 // Create reusable transporter
 const createTransporter = () => {
   // Check if email credentials are configured
@@ -49,7 +52,7 @@ const sendVerificationEmail = async (
           </div>
           <p>You can now log in to your Canoja account and proceed to purchase a subscription plan.</p>
           <div style="text-align: center; margin: 24px 0;">
-            <a href="canoja://change-password?email=${encodeURIComponent(toEmail)}&password=${encodeURIComponent(password)}"
+            <a href="${BACKEND_BASE_URL}/api/users/deeplink/change-password?email=${encodeURIComponent(toEmail)}&password=${encodeURIComponent(password)}"
                style="background-color: #10b981; color: #ffffff; padding: 12px 28px;
                       border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
               Change Password
@@ -197,7 +200,7 @@ const sendApprovalEmail = async (toEmail, businessName, password = null) => {
           </div>
           <p>You can now log in to your Canoja account and proceed to purchase a subscription plan.</p>
           <div style="text-align: center; margin: 24px 0;">
-            <a href="canoja://change-password?email=${encodeURIComponent(toEmail)}&password=${encodeURIComponent(password)}"
+            <a href="${BACKEND_BASE_URL}/api/users/deeplink/change-password?email=${encodeURIComponent(toEmail)}&password=${encodeURIComponent(password)}"
                style="background-color: #10b981; color: #ffffff; padding: 12px 28px;
                       border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
               Change Password
