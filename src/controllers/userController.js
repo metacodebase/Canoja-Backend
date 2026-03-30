@@ -22,7 +22,8 @@ const generateRefreshToken = (userId) => {
 // Register user
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, password } = req.body;
+    const email = req.body.email?.toLowerCase().trim();
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -80,7 +81,8 @@ const registerUser = async (req, res) => {
 // Login user
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = req.body.email?.toLowerCase().trim();
 
     // Find user
     const user = await User.findOne({ email });
@@ -204,7 +206,7 @@ const generateOTP = () => {
 // Request password reset (sends OTP)
 const requestPasswordReset = async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = req.body.email?.toLowerCase().trim();
 
     if (!email) {
       return res.status(400).json({
@@ -267,7 +269,8 @@ const requestPasswordReset = async (req, res) => {
 // Verify OTP only (without resetting password)
 const verifyOTP = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { otp } = req.body;
+    const email = req.body.email?.toLowerCase().trim();
 
     if (!email || !otp) {
       return res.status(400).json({
@@ -322,7 +325,8 @@ const verifyOTP = async (req, res) => {
 // Verify OTP and reset password
 const verifyOTPAndResetPassword = async (req, res) => {
   try {
-    const { email, otp, newPassword } = req.body;
+    const { otp, newPassword } = req.body;
+    const email = req.body.email?.toLowerCase().trim();
 
     if (!email || !otp || !newPassword) {
       return res.status(400).json({
