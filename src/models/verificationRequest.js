@@ -8,7 +8,7 @@ const verificationRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
+      enum: ["pending", "approved", "rejected", "auto_verified"],
       default: "pending",
     },
     adminVerifiedRequired: {

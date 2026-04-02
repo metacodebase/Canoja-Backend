@@ -633,6 +633,11 @@ function isShopOpenNow(shop) {
 }
 
 // --- Format shop data for response (WITH BACKWARD COMPATIBILITY) ---
+function isLicenseExpired(expiration_date) {
+  if (!expiration_date) return false;
+  return new Date(expiration_date) < new Date();
+}
+
 function formatShopData(record, userLat = null, userLng = null) {
   const [lng, lat] = record.location?.coordinates || [null, null];
 
@@ -686,7 +691,9 @@ function formatShopData(record, userLat = null, userLng = null) {
 
     // License Information
     license_number: record.license_number,
-    license_status: record.license_status,
+    license_status: isLicenseExpired(record.expiration_date)
+      ? "Inactive"
+      : record.license_status,
     license_type: record.license_type,
     issue_date: record.issue_date,
     expiration_date: record.expiration_date,
@@ -774,7 +781,9 @@ function formatShopData(record, userLat = null, userLng = null) {
     operator_name: record.operator_name,
 
     // Verification Status
-    canojaVerified: record.canojaVerified || false,
+    canojaVerified: isLicenseExpired(record.expiration_date)
+      ? false
+      : record.canojaVerified || false,
     claimed: record.claimed || false,
     featured: record.featured || false,
     adminVerificationRequired: record.adminVerificationRequired || false,
@@ -784,7 +793,9 @@ function formatShopData(record, userLat = null, userLng = null) {
           // BACKWARD COMPATIBLE
           business_name: record.business_name,
           license_number: record.license_number,
-          license_status: record.license_status,
+          license_status: isLicenseExpired(record.expiration_date)
+            ? "Inactive"
+            : record.license_status,
           license_type: record.license_type,
           address: record.business_address,
           city: record.city,

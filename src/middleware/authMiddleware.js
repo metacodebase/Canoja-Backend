@@ -23,6 +23,14 @@ const authMiddleware = async (req, res, next) => {
       });
     }
 
+    if (user.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        code: "ACCOUNT_DEACTIVATED",
+        error: "Your account has been deactivated.",
+      });
+    }
+
     req.user = user;
     next();
   } catch (error) {
@@ -53,6 +61,13 @@ const adminMiddleware = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         error: "Invalid token. Admin not found.",
+      });
+    }
+
+    if (admin.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        error: "Access denied. Admin privileges required.",
       });
     }
 

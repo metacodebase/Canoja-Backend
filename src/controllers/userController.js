@@ -93,6 +93,15 @@ const loginUser = async (req, res) => {
       });
     }
 
+    // Check if user is deactivated
+    if (user.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        code: "ACCOUNT_DEACTIVATED",
+        error: "Your account has been deactivated.",
+      });
+    }
+
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {

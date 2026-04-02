@@ -61,6 +61,55 @@ const autoRegisterUser = async (email, password, licenseRecordId = null) => {
   return { user, isNewUser: true };
 };
 
+/**
+ * Save an auto-verification record so admin history includes it
+ */
+const saveAutoVerificationRecord = async ({
+  pharmacyId,
+  userId,
+  business_type,
+  legal_business_name,
+  physical_address,
+  business_phone_number,
+  website_or_social_media_link,
+  parsedContactPerson,
+  parsedLicenseInfo,
+  ip_address,
+  user_agent,
+}) => {
+  try {
+    const record = new VerificationRequest({
+      pharmacyId: pharmacyId?.toString(),
+      status: "auto_verified",
+      adminVerifiedRequired: false,
+      claimRequested: true,
+      verifyRequested: true,
+      userId: userId?.toString(),
+      business_type,
+      verification_method: "auto",
+      verification_email_sent: true,
+      verification_email_sent_at: new Date(),
+      legal_business_name,
+      physical_address,
+      business_phone_number,
+      website_or_social_media_link,
+      contact_person: parsedContactPerson,
+      license_information: parsedLicenseInfo || {},
+      ownership_attestation: true,
+      ownership_attestation_timestamp: new Date(),
+      verification_metadata: {
+        ip_address,
+        user_agent,
+        submission_timestamp: new Date(),
+      },
+    });
+    await record.save();
+  } catch (err) {
+    // Non-critical — log but don't break the response
+    console.error("Failed to save auto-verification record:", err);
+  }
+};
+
 const uploadFields = upload.fields([
   { name: "state_license_document", maxCount: 1 },
   { name: "utility_bill", maxCount: 1 },
@@ -283,6 +332,20 @@ const createClaimRequest = async (req, res) => {
         console.error("Failed to send verification email:", emailError);
       }
 
+      await saveAutoVerificationRecord({
+        pharmacyId: matchedRecord._id,
+        userId: user._id,
+        business_type: "smoke_shop",
+        legal_business_name,
+        physical_address,
+        business_phone_number,
+        website_or_social_media_link,
+        parsedContactPerson,
+        parsedLicenseInfo,
+        ip_address: req.ip,
+        user_agent: req.headers["user-agent"],
+      });
+
       return res.json({
         success: true,
         message:
@@ -380,6 +443,20 @@ const createClaimRequest = async (req, res) => {
       } catch (emailError) {
         console.error("Failed to send verification email:", emailError);
       }
+
+      await saveAutoVerificationRecord({
+        pharmacyId: matchedRecord._id,
+        userId: user._id,
+        business_type: "cannabis_operator",
+        legal_business_name,
+        physical_address,
+        business_phone_number,
+        website_or_social_media_link,
+        parsedContactPerson,
+        parsedLicenseInfo,
+        ip_address: req.ip,
+        user_agent: req.headers["user-agent"],
+      });
 
       return res.json({
         success: true,
@@ -583,13 +660,13 @@ const createClaimRequest = async (req, res) => {
 
 const getAdminPendingRequests = async (req, res) => {
   try {
-    const { requestType } = req.query;
+    const { requestType, business_type } = req.query;
 
-    // Only show cannabis operators pending requests (smoke shops are auto-verified)
-    let filter = {
-      status: "pending",
-      business_type: "cannabis_operator", // Filter out smoke shops
-    };
+    let filter = { status: "pending" };
+
+    if (business_type) {
+      filter.business_type = business_type;
+    }
 
     if (requestType === "claim") {
       filter.claimRequested = true;
