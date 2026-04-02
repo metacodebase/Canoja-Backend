@@ -74,6 +74,8 @@ const saveAutoVerificationRecord = async ({
   website_or_social_media_link,
   parsedContactPerson,
   parsedLicenseInfo,
+  uploadedDocuments,
+  govIdDocument,
   ip_address,
   user_agent,
 }) => {
@@ -93,8 +95,13 @@ const saveAutoVerificationRecord = async ({
       physical_address,
       business_phone_number,
       website_or_social_media_link,
-      contact_person: parsedContactPerson,
+      contact_person: {
+        ...parsedContactPerson,
+        government_issued_id_document:
+          govIdDocument || parsedContactPerson?.government_issued_id_document,
+      },
       license_information: parsedLicenseInfo || {},
+      uploaded_documents: uploadedDocuments || {},
       ownership_attestation: true,
       ownership_attestation_timestamp: new Date(),
       verification_metadata: {
@@ -263,6 +270,18 @@ const createClaimRequest = async (req, res) => {
       ? "smoke_shop"
       : "cannabis_operator";
 
+    // Extract uploaded document URLs from req.files (available across all paths)
+    const uploadedDocuments = {};
+    if (req.files) {
+      if (req.files.state_license_document)
+        uploadedDocuments.state_license_document =
+          req.files.state_license_document[0].location;
+      if (req.files.utility_bill)
+        uploadedDocuments.utility_bill = req.files.utility_bill[0].location;
+    }
+    const govIdDocument =
+      req.files?.government_issued_id_document?.[0]?.location || null;
+
     console.log(
       `Business type from DB: ${businessType} (smoke_shop: ${matchedRecord.smoke_shop})`,
     );
@@ -342,6 +361,8 @@ const createClaimRequest = async (req, res) => {
         website_or_social_media_link,
         parsedContactPerson,
         parsedLicenseInfo,
+        uploadedDocuments,
+        govIdDocument,
         ip_address: req.ip,
         user_agent: req.headers["user-agent"],
       });
@@ -454,6 +475,8 @@ const createClaimRequest = async (req, res) => {
         website_or_social_media_link,
         parsedContactPerson,
         parsedLicenseInfo,
+        uploadedDocuments,
+        govIdDocument,
         ip_address: req.ip,
         user_agent: req.headers["user-agent"],
       });
