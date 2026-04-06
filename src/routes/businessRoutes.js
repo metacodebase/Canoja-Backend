@@ -64,6 +64,13 @@ const menuUpload = multer({
  */
 router.post("/:businessId/view", businessController.recordView);
 
+/**
+ * @route   POST /api/business/:businessId/event
+ * @desc    Record an analytics event (phone_tap, directions_tap, website_tap, menu_view)
+ * @access  Public
+ */
+router.post("/:businessId/event", businessController.recordEvent);
+
 // All routes require authentication
 router.use(authMiddleware);
 
@@ -115,5 +122,12 @@ router.post("/menu", menuUpload.single("menu"), businessController.uploadMenu);
  * @access  Private
  */
 router.get("/engagement", businessController.getEngagementStats);
+
+/**
+ * @route   GET /api/business/analytics?period=7|30|90
+ * @desc    Get analytics for the operator's business
+ * @access  Private
+ */
+router.get("/analytics", businessController.getAnalytics);
 
 module.exports = router;

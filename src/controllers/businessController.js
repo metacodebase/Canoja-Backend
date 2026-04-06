@@ -1,6 +1,7 @@
 const LicenseRecord = require("../models/licenseRecord");
 const VerificationRequest = require("../models/verificationRequest");
 const BusinessView = require("../models/businessView");
+const AnalyticsEvent = require("../models/analyticsEvent");
 const { uploadToS3 } = require("../utils/s3Upload");
 
 // --- Get Business Dashboard Data ---
@@ -443,10 +444,10 @@ async function getEngagementStats(req, res) {
 
 // --- Record a profile view (anonymous, one per device per business forever) ---
 async function recordView(req, res) {
-  try {
-    const { businessId } = req.params;
-    const { device_id } = req.body;
+  const { businessId } = req.params;
+  const { device_id } = req.body;
 
+  try {
     if (!businessId || !device_id) {
       return res.status(400).json({
         success: false,
@@ -457,10 +458,16 @@ async function recordView(req, res) {
     // insertOne with unique index — if already exists, duplicate key error is thrown and caught
     await BusinessView.create({ business_id: businessId, device_id });
 
-    // Only reaches here if it's a new view — increment count
+    // Only reaches here if it's a new unique device — increment count
     await LicenseRecord.findByIdAndUpdate(businessId, {
       $inc: { view_count: 1 },
     });
+
+    // Always record a time-series profile_view event (every visit counts for analytics)
+    AnalyticsEvent.create({
+      business_id: businessId,
+      event_type: "profile_view",
+    }).catch(() => {});
 
     console.log(
       `✅ View recorded — business: ${businessId}, device: ${device_id}`,
@@ -468,13 +475,194 @@ async function recordView(req, res) {
     return res.status(201).json({ success: true, message: "View recorded" });
   } catch (error) {
     if (error.code === 11000) {
-      // Duplicate key — device already viewed this business, silently ignore
+      // Duplicate key — device already viewed, still record the time-series event
+      AnalyticsEvent.create({
+        business_id: businessId,
+        event_type: "profile_view",
+      }).catch(() => {});
       return res.status(200).json({ success: true, message: "Already viewed" });
     }
     console.error("❌ Error recording view:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to record view" });
+  }
+}
+
+// --- Record an analytics event (public, no auth) ---
+async function recordEvent(req, res) {
+  try {
+    const { businessId } = req.params;
+    const { event_type } = req.body;
+
+    const { VALID_EVENTS } = require("../models/analyticsEvent");
+
+    if (!businessId || !event_type) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "businessId and event_type are required",
+        });
+    }
+
+    if (!VALID_EVENTS.includes(event_type)) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: `Invalid event_type. Must be one of: ${VALID_EVENTS.join(", ")}`,
+        });
+    }
+
+    await AnalyticsEvent.create({ business_id: businessId, event_type });
+
+    return res.status(201).json({ success: true });
+  } catch (error) {
+    console.error("❌ Error recording analytics event:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to record event" });
+  }
+}
+
+// --- Get analytics for the operator's business ---
+async function getAnalytics(req, res) {
+  try {
+    const userId = req.user?.id || req.user?._id;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Authentication required" });
+    }
+
+    const period = parseInt(req.query.period) || 30;
+    if (![7, 30, 90].includes(period)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "period must be 7, 30, or 90" });
+    }
+
+    const business = await LicenseRecord.findOne({
+      claimedBy: userId,
+      claimed: true,
+    }).select("_id business_name");
+
+    if (!business) {
+      return res
+        .status(404)
+        .json({ success: false, error: "No business found for this user" });
+    }
+
+    const now = new Date();
+    const currentStart = new Date(now);
+    currentStart.setDate(currentStart.getDate() - period);
+    currentStart.setHours(0, 0, 0, 0);
+
+    const prevStart = new Date(currentStart);
+    prevStart.setDate(prevStart.getDate() - period);
+
+    // Aggregate current period: total counts per event_type
+    const currentTotals = await AnalyticsEvent.aggregate([
+      {
+        $match: {
+          business_id: business._id,
+          createdAt: { $gte: currentStart, $lte: now },
+        },
+      },
+      { $group: { _id: "$event_type", count: { $sum: 1 } } },
+    ]);
+
+    // Aggregate previous period: total counts per event_type (for % change)
+    const prevTotals = await AnalyticsEvent.aggregate([
+      {
+        $match: {
+          business_id: business._id,
+          createdAt: { $gte: prevStart, $lt: currentStart },
+        },
+      },
+      { $group: { _id: "$event_type", count: { $sum: 1 } } },
+    ]);
+
+    // Daily breakdown for current period
+    const dailyBreakdown = await AnalyticsEvent.aggregate([
+      {
+        $match: {
+          business_id: business._id,
+          createdAt: { $gte: currentStart, $lte: now },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+            event_type: "$event_type",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.date": 1 } },
+    ]);
+
+    // Build totals map
+    const toMap = (arr) =>
+      arr.reduce((acc, { _id, count }) => {
+        acc[_id] = count;
+        return acc;
+      }, {});
+    const curr = toMap(currentTotals);
+    const prev = toMap(prevTotals);
+
+    const EVENT_TYPES = [
+      "profile_view",
+      "phone_tap",
+      "directions_tap",
+      "website_tap",
+      "menu_view",
+    ];
+
+    const metrics = EVENT_TYPES.map((type) => {
+      const current = curr[type] || 0;
+      const previous = prev[type] || 0;
+      const change =
+        previous === 0
+          ? current > 0
+            ? 100
+            : 0
+          : Math.round(((current - previous) / previous) * 100);
+      return { event_type: type, current, previous, change_pct: change };
+    });
+
+    // Build a clean daily array: [{ date, profile_view, phone_tap, ... }]
+    const dailyMap = {};
+    for (const row of dailyBreakdown) {
+      const { date, event_type } = row._id;
+      if (!dailyMap[date]) dailyMap[date] = { date };
+      dailyMap[date][event_type] = row.count;
+    }
+    const daily = Object.values(dailyMap).sort((a, b) =>
+      a.date.localeCompare(b.date),
+    );
+
+    res.json({
+      success: true,
+      data: {
+        business_name: business.business_name,
+        period,
+        metrics,
+        daily,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching analytics:", error);
+    res
+      .status(500)
+      .json({
+        success: false,
+        error: "Failed to fetch analytics",
+        details: error.message,
+      });
   }
 }
 
@@ -487,4 +675,6 @@ module.exports = {
   uploadMenu,
   getEngagementStats,
   recordView,
+  recordEvent,
+  getAnalytics,
 };
