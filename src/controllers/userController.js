@@ -227,10 +227,9 @@ const requestPasswordReset = async (req, res) => {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      // Don't reveal if user exists for security
-      return res.json({
-        success: true,
-        message: "If an account exists with this email, an OTP has been sent.",
+      return res.status(404).json({
+        success: false,
+        error: "No account found with this email address.",
       });
     }
 
