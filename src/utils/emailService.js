@@ -382,10 +382,54 @@ const sendPasswordResetOTP = async (toEmail, otp) => {
   }
 };
 
+/**
+ * Send email change OTP to the new email address
+ * @param {string} toEmail - New email address
+ * @param {string} otp - One-time password (6 digits)
+ */
+const sendEmailChangeOTP = async (toEmail, otp) => {
+  try {
+    const transporter = createTransporter();
+    if (!transporter) {
+      console.log("Email service not configured. Skipping OTP email.");
+      return { success: false, message: "Email service not configured" };
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: toEmail,
+      subject: "Canoja - Verify Your New Email Address",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #10b981;">Verify Your New Email</h2>
+          <p>Hello,</p>
+          <p>You requested to change your email address on Canoja. Enter the code below to confirm this new email address.</p>
+          <div style="background-color: #f3f4f6; padding: 24px; border-radius: 8px; margin: 24px 0; text-align: center;">
+            <p style="margin: 0 0 12px 0; color: #64748b; font-size: 14px;">Your verification code:</p>
+            <h1 style="margin: 0; color: #10b981; font-size: 36px; letter-spacing: 8px; font-weight: 700;">${otp}</h1>
+            <p style="margin: 12px 0 0 0; color: #dc2626; font-size: 12px;">This code expires in 10 minutes.</p>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">If you did not request this change, please ignore this email.</p>
+          <p>Best regards,<br>The Canoja Team</p>
+        </div>
+      `,
+      text: `Verify Your New Email\n\nYour verification code is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you did not request this change, please ignore this email.\n\nThe Canoja Team`,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email change OTP sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending email change OTP:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendVerificationEmail,
   sendPendingReviewEmail,
   sendApprovalEmail,
   sendRejectionEmail,
   sendPasswordResetOTP,
+  sendEmailChangeOTP,
 };

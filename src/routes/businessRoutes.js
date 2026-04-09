@@ -130,4 +130,18 @@ router.get("/engagement", businessController.getEngagementStats);
  */
 router.get("/analytics", businessController.getAnalytics);
 
+/**
+ * @route   POST /api/business/request-email-change
+ * @desc    Send OTP to new email address to verify ownership before changing
+ * @access  Private
+ */
+router.post("/request-email-change", businessController.requestEmailChange);
+
+/**
+ * @route   POST /api/business/confirm-email-change
+ * @desc    Verify OTP and update the operator's login email
+ * @access  Private
+ */
+router.post("/confirm-email-change", businessController.confirmEmailChange);
+
 module.exports = router;

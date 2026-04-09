@@ -24,6 +24,21 @@ const passwordResetOTPSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // For email change flow
+    purpose: {
+      type: String,
+      enum: ["password_reset", "email_change"],
+      default: "password_reset",
+    },
+    new_email: {
+      type: String,
+      default: null,
+    },
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
   },
   { timestamps: true },
 );

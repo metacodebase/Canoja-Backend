@@ -3,6 +3,12 @@ const VerificationRequest = require("../models/verificationRequest");
 const BusinessView = require("../models/businessView");
 const AnalyticsEvent = require("../models/analyticsEvent");
 const { uploadToS3 } = require("../utils/s3Upload");
+const User = require("../models/user");
+const PasswordResetOTP = require("../models/passwordResetOTP");
+const { sendEmailChangeOTP } = require("../utils/emailService");
+
+const generateOTP = () =>
+  Math.floor(100000 + Math.random() * 900000).toString();
 
 // --- Get Business Dashboard Data ---
 async function getBusinessDashboard(req, res) {
@@ -188,6 +194,8 @@ async function getBusinessProfile(req, res) {
       });
     }
 
+    const user = await User.findById(userId).select("email");
+
     res.json({
       success: true,
       data: {
@@ -196,7 +204,10 @@ async function getBusinessProfile(req, res) {
         address: business.business_address,
         phone:
           business.contact_information?.phone || business.business_phone_number,
-        email: business.contact_information?.email,
+        // scraped public email — read-only, shown on detail screen
+        scraped_email: business.contact_information?.email,
+        // operator's personal login email — editable, never shown publicly
+        login_email: user?.email || "",
         website:
           business.contact_information?.website ||
           business.website_or_social_media_link,
@@ -498,21 +509,17 @@ async function recordEvent(req, res) {
     const { VALID_EVENTS } = require("../models/analyticsEvent");
 
     if (!businessId || !event_type) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "businessId and event_type are required",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "businessId and event_type are required",
+      });
     }
 
     if (!VALID_EVENTS.includes(event_type)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: `Invalid event_type. Must be one of: ${VALID_EVENTS.join(", ")}`,
-        });
+      return res.status(400).json({
+        success: false,
+        message: `Invalid event_type. Must be one of: ${VALID_EVENTS.join(", ")}`,
+      });
     }
 
     await AnalyticsEvent.create({ business_id: businessId, event_type });
@@ -656,13 +663,167 @@ async function getAnalytics(req, res) {
     });
   } catch (error) {
     console.error("Error fetching analytics:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch analytics",
+      details: error.message,
+    });
+  }
+}
+
+// --- Request Email Change (sends OTP to new email) ---
+async function requestEmailChange(req, res) {
+  try {
+    const userId = req.user?.id || req.user?._id;
+    const new_email = req.body.new_email?.toLowerCase().trim();
+
+    if (!new_email) {
+      return res
+        .status(400)
+        .json({ success: false, error: "New email is required" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(new_email)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid email address" });
+    }
+
+    // Check if email is already taken by another user
+    const existing = await User.findOne({ email: new_email });
+    if (existing && existing._id.toString() !== userId.toString()) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+          error: "This email is already in use by another account",
+        });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    if (user.email === new_email) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "New email must be different from your current email",
+        });
+    }
+
+    // Invalidate existing email change OTPs for this user
+    await PasswordResetOTP.updateMany(
+      { user_id: userId, purpose: "email_change", used: false },
+      { used: true },
+    );
+
+    const otp = generateOTP();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await new PasswordResetOTP({
+      email: new_email,
+      otp,
+      expiresAt,
+      purpose: "email_change",
+      new_email,
+      user_id: userId,
+    }).save();
+
+    try {
+      await sendEmailChangeOTP(new_email, otp);
+    } catch (emailError) {
+      console.error("Error sending email change OTP:", emailError);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          error: "Failed to send verification email. Please try again.",
+        });
+    }
+
+    res.json({
+      success: true,
+      message: "Verification code sent to your new email address.",
+    });
+  } catch (error) {
+    console.error("Request email change error:", error);
     res
       .status(500)
       .json({
         success: false,
-        error: "Failed to fetch analytics",
-        details: error.message,
+        error: "Failed to process email change request",
       });
+  }
+}
+
+// --- Confirm Email Change (verify OTP and update User.email) ---
+async function confirmEmailChange(req, res) {
+  try {
+    const userId = req.user?.id || req.user?._id;
+    const { otp } = req.body;
+
+    if (!otp) {
+      return res.status(400).json({ success: false, error: "OTP is required" });
+    }
+
+    const otpRecord = await PasswordResetOTP.findOne({
+      user_id: userId,
+      purpose: "email_change",
+      used: false,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!otpRecord) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "No pending email change found. Please request a new code.",
+        });
+    }
+
+    if (otpRecord.otp !== otp) {
+      otpRecord.attempts += 1;
+      await otpRecord.save();
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid verification code" });
+    }
+
+    const newEmail = otpRecord.new_email;
+
+    // Double-check email not taken (race condition guard)
+    const taken = await User.findOne({ email: newEmail });
+    if (taken && taken._id.toString() !== userId.toString()) {
+      otpRecord.used = true;
+      await otpRecord.save();
+      return res
+        .status(409)
+        .json({
+          success: false,
+          error: "This email has been taken by another account",
+        });
+    }
+
+    await User.findByIdAndUpdate(userId, { email: newEmail });
+
+    otpRecord.used = true;
+    await otpRecord.save();
+
+    res.json({
+      success: true,
+      message: "Email updated successfully",
+      new_email: newEmail,
+    });
+  } catch (error) {
+    console.error("Confirm email change error:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to confirm email change" });
   }
 }
 
@@ -677,4 +838,6 @@ module.exports = {
   recordView,
   recordEvent,
   getAnalytics,
+  requestEmailChange,
+  confirmEmailChange,
 };
