@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const LicenseRecord = require("../models/licenseRecord");
 const PasswordResetOTP = require("../models/passwordResetOTP");
 const { sendPasswordResetOTP } = require("../utils/emailService");
 
@@ -122,6 +123,22 @@ const loginUser = async (req, res) => {
     ); // 60 days
     await user.save();
 
+    // Fetch all linked businesses for operators
+    let businesses = [];
+    if (user.role === "operator" && user.licenseRecords?.length > 0) {
+      businesses = await LicenseRecord.find(
+        { _id: { $in: user.licenseRecords } },
+        {
+          business_name: 1,
+          claimed: 1,
+          canojaVerified: 1,
+          license_type: 1,
+          city: 1,
+          stateName: 1,
+        },
+      ).lean();
+    }
+
     res.json({
       success: true,
       message: "Login successful",
@@ -133,6 +150,7 @@ const loginUser = async (req, res) => {
         email: user.email,
         role: user.role,
         requiresPasswordChange: user.requiresPasswordChange || false,
+        businesses,
       },
     });
   } catch (error) {

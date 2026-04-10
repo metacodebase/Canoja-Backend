@@ -8,6 +8,7 @@ const {
   sendPendingReviewEmail,
   sendApprovalEmail,
   sendRejectionEmail,
+  sendBusinessLinkedEmail,
 } = require("../utils/emailService");
 
 /**
@@ -33,28 +34,29 @@ const generateDummyPassword = () => {
  * @returns {Promise<Object>} Created user object and whether user was newly created
  */
 const autoRegisterUser = async (email, password, licenseRecordId = null) => {
-  // Check if user already exists. If yes, we don't want to reuse the account
-  // for another claim – each email can only be associated with one claimed
-  // record for now.
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    const error = new Error(
-      "This email is already associated with a claimed business. Please use a different email address.",
-    );
-    error.code = "EMAIL_ALREADY_ASSOCIATED";
-    throw error;
+    // Link the new business to the existing account if not already linked
+    if (
+      licenseRecordId &&
+      !existingUser.licenseRecords
+        .map((id) => id.toString())
+        .includes(licenseRecordId.toString())
+    ) {
+      existingUser.licenseRecords.push(licenseRecordId);
+      await existingUser.save();
+    }
+    return { user: existingUser, isNewUser: false };
   }
 
-  // Hash password
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  // Create new user
   const user = new User({
     email,
     password: hashedPassword,
     role: "operator",
     licenseRecords: licenseRecordId ? [licenseRecordId] : [],
-    requiresPasswordChange: true, // New users must change password on first login
+    requiresPasswordChange: true,
   });
 
   await user.save();
@@ -187,25 +189,6 @@ const createClaimRequest = async (req, res) => {
       });
     }
 
-    // Global email check: prevent the same email from being used to claim
-    // multiple businesses (applies to BOTH auto-verification and manual
-    // verification flows). We do this early so the user gets immediate
-    // feedback and we don't create VerificationRequest records that can
-    // never be approved.
-    if (parsedContactPerson.email_address) {
-      const existingUserForEmail = await User.findOne({
-        email: parsedContactPerson.email_address,
-      });
-
-      if (existingUserForEmail) {
-        return res.status(400).json({
-          success: false,
-          error:
-            "This email is already associated with another claimed business. Please use a different email address.",
-        });
-      }
-    }
-
     // Step 1: Find the matching LicenseRecord
     // Prefer pharmacyId (exact ID match) if provided, otherwise fall back to
     // matching by business name / DBA (previous behaviour).
@@ -290,24 +273,11 @@ const createClaimRequest = async (req, res) => {
     if (isSmokeShopBusiness) {
       // Generate dummy password and auto-register user
       const dummyPassword = generateDummyPassword();
-      let user;
-      let isNewUser;
-      try {
-        ({ user, isNewUser } = await autoRegisterUser(
-          parsedContactPerson.email_address,
-          dummyPassword,
-          matchedRecord._id,
-        ));
-      } catch (error) {
-        if (error.code === "EMAIL_ALREADY_ASSOCIATED") {
-          return res.status(400).json({
-            success: false,
-            error:
-              "This email is already associated with another claimed business. Please use a different email address.",
-          });
-        }
-        throw error;
-      }
+      const { user, isNewUser } = await autoRegisterUser(
+        parsedContactPerson.email_address,
+        dummyPassword,
+        matchedRecord._id,
+      );
 
       // Update LicenseRecord (don't set canojaVerified if shop is not already verified)
       const updateFields = {
@@ -334,18 +304,25 @@ const createClaimRequest = async (req, res) => {
 
       await LicenseRecord.findByIdAndUpdate(matchedRecord._id, updateFields);
 
-      // Send verification email (only include password for new users)
+      // Send appropriate email based on whether this is a new or existing account
       try {
-        await sendVerificationEmail(
-          parsedContactPerson.email_address,
-          legal_business_name,
-          isNewUser ? dummyPassword : null, // Only send password if user is new
-        );
+        if (isNewUser) {
+          await sendVerificationEmail(
+            parsedContactPerson.email_address,
+            legal_business_name,
+            dummyPassword,
+          );
+        } else {
+          await sendBusinessLinkedEmail(
+            parsedContactPerson.email_address,
+            legal_business_name,
+          );
+        }
         console.log(
-          `Verification email sent to ${parsedContactPerson.email_address} (${isNewUser ? "new user" : "existing user"})`,
+          `Email sent to ${parsedContactPerson.email_address} (${isNewUser ? "new user" : "existing user - business linked"})`,
         );
       } catch (emailError) {
-        console.error("Failed to send verification email:", emailError);
+        console.error("Failed to send email:", emailError);
       }
 
       await saveAutoVerificationRecord({
@@ -401,24 +378,11 @@ const createClaimRequest = async (req, res) => {
 
       // Generate dummy password and auto-register user
       const dummyPassword = generateDummyPassword();
-      let user;
-      let isNewUser;
-      try {
-        ({ user, isNewUser } = await autoRegisterUser(
-          parsedContactPerson.email_address,
-          dummyPassword,
-          matchedRecord._id,
-        ));
-      } catch (error) {
-        if (error.code === "EMAIL_ALREADY_ASSOCIATED") {
-          return res.status(400).json({
-            success: false,
-            error:
-              "This email is already associated with another claimed business. Please use a different email address.",
-          });
-        }
-        throw error;
-      }
+      const { user, isNewUser } = await autoRegisterUser(
+        parsedContactPerson.email_address,
+        dummyPassword,
+        matchedRecord._id,
+      );
 
       // Update LicenseRecord (don't set canojaVerified if shop is not already verified)
       const updateFields = {
@@ -445,18 +409,25 @@ const createClaimRequest = async (req, res) => {
 
       await LicenseRecord.findByIdAndUpdate(matchedRecord._id, updateFields);
 
-      // Send verification email (only include password for new users)
+      // Send appropriate email based on whether this is a new or existing account
       try {
-        await sendVerificationEmail(
-          parsedContactPerson.email_address,
-          legal_business_name,
-          isNewUser ? dummyPassword : null, // Only send password if user is new
-        );
+        if (isNewUser) {
+          await sendVerificationEmail(
+            parsedContactPerson.email_address,
+            legal_business_name,
+            dummyPassword,
+          );
+        } else {
+          await sendBusinessLinkedEmail(
+            parsedContactPerson.email_address,
+            legal_business_name,
+          );
+        }
         console.log(
-          `Verification email sent to ${parsedContactPerson.email_address} (${isNewUser ? "new user" : "existing user"})`,
+          `Email sent to ${parsedContactPerson.email_address} (${isNewUser ? "new user" : "existing user - business linked"})`,
         );
       } catch (emailError) {
-        console.error("Failed to send verification email:", emailError);
+        console.error("Failed to send email:", emailError);
       }
 
       await saveAutoVerificationRecord({
@@ -745,24 +716,11 @@ const approveRequest = async (req, res) => {
 
     // Generate dummy password and auto-register user
     const dummyPassword = generateDummyPassword();
-    let user;
-    let isNewUser;
-    try {
-      ({ user, isNewUser } = await autoRegisterUser(
-        request.contact_person.email_address,
-        dummyPassword,
-        licenseRecordId,
-      ));
-    } catch (error) {
-      if (error.code === "EMAIL_ALREADY_ASSOCIATED") {
-        return res.status(400).json({
-          success: false,
-          error:
-            "This email is already associated with another claimed business. Please use a different email address.",
-        });
-      }
-      throw error;
-    }
+    const { user, isNewUser } = await autoRegisterUser(
+      request.contact_person.email_address,
+      dummyPassword,
+      licenseRecordId,
+    );
 
     // Handle LicenseRecord update if found
     if (licenseRecord) {
@@ -797,18 +755,25 @@ const approveRequest = async (req, res) => {
       await LicenseRecord.findByIdAndUpdate(licenseRecordId, updateFields);
     }
 
-    // Send approval email (only include password for new users)
+    // Send appropriate email based on whether this is a new or existing account
     try {
-      await sendApprovalEmail(
-        request.contact_person.email_address,
-        request.legal_business_name,
-        isNewUser ? dummyPassword : null, // Only send password if user is new
-      );
+      if (isNewUser) {
+        await sendApprovalEmail(
+          request.contact_person.email_address,
+          request.legal_business_name,
+          dummyPassword,
+        );
+      } else {
+        await sendBusinessLinkedEmail(
+          request.contact_person.email_address,
+          request.legal_business_name,
+        );
+      }
       console.log(
-        `Approval email sent to ${request.contact_person.email_address} (${isNewUser ? "new user" : "existing user"})`,
+        `Email sent to ${request.contact_person.email_address} (${isNewUser ? "new user" : "existing user - business linked"})`,
       );
     } catch (emailError) {
-      console.error("Failed to send approval email:", emailError);
+      console.error("Failed to send email:", emailError);
       // Continue even if email fails
     }
 

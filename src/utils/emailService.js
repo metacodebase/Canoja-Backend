@@ -425,6 +425,55 @@ const sendEmailChangeOTP = async (toEmail, otp) => {
   }
 };
 
+const sendBusinessLinkedEmail = async (toEmail, businessName) => {
+  try {
+    const transporter = createTransporter();
+    if (!transporter) {
+      console.log(
+        "Email service not configured. Skipping business linked email.",
+      );
+      return { success: false, message: "Email service not configured" };
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: toEmail,
+      subject: `${businessName} has been added to your Canoja account`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #10b981;">Business Added to Your Account</h2>
+          <p>Hello,</p>
+          <p><strong>${businessName}</strong> has been added to your Canoja account.</p>
+          <div style="background-color: #eff6ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0;">You can now log in with your existing credentials to manage all your linked businesses from the dashboard.</p>
+          </div>
+          <p>If you have any questions, please contact our support team.</p>
+          <p>Best regards,<br>The Canoja Team</p>
+        </div>
+      `,
+      text: `
+        Business Added to Your Account
+
+        ${businessName} has been added to your Canoja account.
+
+        You can now log in with your existing credentials to manage all your linked businesses from the dashboard.
+
+        If you have any questions, please contact our support team.
+
+        Best regards,
+        The Canoja Team
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Business linked email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending business linked email:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendVerificationEmail,
   sendPendingReviewEmail,
@@ -432,4 +481,5 @@ module.exports = {
   sendRejectionEmail,
   sendPasswordResetOTP,
   sendEmailChangeOTP,
+  sendBusinessLinkedEmail,
 };
