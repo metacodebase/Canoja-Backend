@@ -378,8 +378,26 @@ function applySearchFilters(shops, filters) {
       }
     }
 
+    // Menu filter
+    if (filters.hasMenu) {
+      if (!shop.menu_link) return false;
+    }
+
     return true;
   });
+}
+
+function applySorting(shops, sortBy) {
+  if (!sortBy) return shops;
+  const sorted = [...shops];
+  if (sortBy === "rating") {
+    sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sortBy === "alphabetical") {
+    sorted.sort((a, b) =>
+      (a.business_name || "").localeCompare(b.business_name || ""),
+    );
+  }
+  return sorted;
 }
 
 // --- Build MongoDB query for location-based search ---
@@ -437,6 +455,9 @@ function buildLocationQuery(lat, lng, radius, filters) {
   }
   if (filters.minRating) {
     query.rating = { $gte: parseFloat(filters.minRating) };
+  }
+  if (filters.hasMenu) {
+    query.menu_link = { $exists: true, $ne: null };
   }
 
   // Only return shops with visibility: true (or undefined, which defaults to true)
@@ -520,6 +541,9 @@ function buildKeywordQuery(keyword, filters) {
   }
   if (filters.minRating) {
     searchConditions.push({ rating: { $gte: parseFloat(filters.minRating) } });
+  }
+  if (filters.hasMenu) {
+    searchConditions.push({ menu_link: { $exists: true, $ne: null } });
   }
 
   // Only return shops with visibility: true (or undefined, which defaults to true)
@@ -896,6 +920,7 @@ async function compareShops(req, res) {
       keyword = null,
       page = 1,
       limit = 10,
+      sortBy = null,
     } = req.body;
 
     const isKeywordSearch = keyword && keyword.trim().length >= 1;
@@ -959,6 +984,7 @@ async function compareShops(req, res) {
         });
 
         shopsWithDistance = applySearchFilters(shopsWithDistance, filters);
+        shopsWithDistance = applySorting(shopsWithDistance, sortBy);
         totalCount = shopsWithDistance.length;
         shops = shopsWithDistance.slice(skip, skip + limitNum);
       } else if (zipCode || radius) {
@@ -1000,6 +1026,7 @@ async function compareShops(req, res) {
         });
 
         shopsWithDistance = applySearchFilters(shopsWithDistance, filters);
+        shopsWithDistance = applySorting(shopsWithDistance, sortBy);
         totalCount = shopsWithDistance.length;
         shops = shopsWithDistance.slice(skip, skip + limitNum);
       } else if (country || state || city) {
@@ -1031,6 +1058,7 @@ async function compareShops(req, res) {
 
         // Apply in-memory filters (openNow, operatorType, etc.)
         formattedShops = applySearchFilters(formattedShops, filters);
+        formattedShops = applySorting(formattedShops, sortBy);
 
         totalCount = formattedShops.length;
 
@@ -1058,6 +1086,7 @@ async function compareShops(req, res) {
 
     if (isKeywordSearch) {
       formattedShops = applySearchFilters(formattedShops, filters);
+      formattedShops = applySorting(formattedShops, sortBy);
       // totalCount = formattedShops.length;
     }
     const totalPages = Math.ceil(totalCount / limitNum);
