@@ -322,11 +322,8 @@ const createClaimRequest = async (req, res) => {
         updateFields.canojaVerified = true;
       }
 
-      // Update contact information
-      if (parsedContactPerson.email_address) {
-        updateFields["contact_information.email"] =
-          parsedContactPerson.email_address;
-      }
+      // Update contact information (email intentionally excluded — operator's
+      // login email must not overwrite the public-facing scraped contact email)
       if (business_phone_number) {
         updateFields["contact_information.phone"] = business_phone_number;
       }
@@ -436,11 +433,8 @@ const createClaimRequest = async (req, res) => {
         updateFields.canojaVerified = true;
       }
 
-      // Update contact information
-      if (parsedContactPerson.email_address) {
-        updateFields["contact_information.email"] =
-          parsedContactPerson.email_address;
-      }
+      // Update contact information (email intentionally excluded — operator's
+      // login email must not overwrite the public-facing scraped contact email)
       if (business_phone_number) {
         updateFields["contact_information.phone"] = business_phone_number;
       }
@@ -789,11 +783,8 @@ const approveRequest = async (req, res) => {
         updateFields.canojaVerified = true;
       }
 
-      // Update contact information if provided
-      if (request.contact_person?.email_address) {
-        updateFields["contact_information.email"] =
-          request.contact_person.email_address;
-      }
+      // Update contact information if provided (email intentionally excluded —
+      // operator's login email must not overwrite the public-facing scraped contact email)
       if (request.business_phone_number) {
         updateFields["contact_information.phone"] =
           request.business_phone_number;
