@@ -378,9 +378,9 @@ function applySearchFilters(shops, filters) {
       }
     }
 
-    // Menu filter
+    // Menu filter — check both Google Maps menu_link and operator-uploaded menu (S3)
     if (filters.hasMenu) {
-      if (!shop.menu_link) return false;
+      if (!shop.menu_link && !shop.menu) return false;
     }
 
     return true;
@@ -394,7 +394,9 @@ function applySorting(shops, sortBy) {
     sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
   } else if (sortBy === "alphabetical") {
     sorted.sort((a, b) =>
-      (a.business_name || "").localeCompare(b.business_name || ""),
+      (a.name || a.business_name || "").localeCompare(
+        b.name || b.business_name || "",
+      ),
     );
   }
   return sorted;
@@ -457,7 +459,10 @@ function buildLocationQuery(lat, lng, radius, filters) {
     query.rating = { $gte: parseFloat(filters.minRating) };
   }
   if (filters.hasMenu) {
-    query.menu_link = { $exists: true, $ne: null };
+    query.$or = [
+      { menu_link: { $exists: true, $ne: null } },
+      { menu: { $exists: true, $ne: null } },
+    ];
   }
 
   // Only return shops with visibility: true (or undefined, which defaults to true)
@@ -543,7 +548,12 @@ function buildKeywordQuery(keyword, filters) {
     searchConditions.push({ rating: { $gte: parseFloat(filters.minRating) } });
   }
   if (filters.hasMenu) {
-    searchConditions.push({ menu_link: { $exists: true, $ne: null } });
+    searchConditions.push({
+      $or: [
+        { menu_link: { $exists: true, $ne: null } },
+        { menu: { $exists: true, $ne: null } },
+      ],
+    });
   }
 
   // Only return shops with visibility: true (or undefined, which defaults to true)
@@ -793,6 +803,7 @@ function formatShopData(record, userLat = null, userLng = null) {
     reservation_links: record.reservation_links,
     booking_appointment_link: record.booking_appointment_link,
     menu_link: record.menu_link,
+    menu: record.menu,
     order_links: record.order_links,
 
     // Owner (Google Maps)
