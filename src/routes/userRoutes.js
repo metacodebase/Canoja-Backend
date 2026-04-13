@@ -9,6 +9,7 @@ const {
   verifyOTPAndResetPassword,
   refreshAccessToken,
   logoutUser,
+  getUserProfile,
 } = require("../controllers/userController");
 const {
   handleChangePasswordDeepLink,
@@ -187,6 +188,9 @@ router.post("/reset-password", verifyOTPAndResetPassword);
 
 // Refresh token route (public - no auth required)
 router.post("/refresh-token", refreshAccessToken);
+
+// Get current user profile — full user doc minus sensitive fields + businesses for operators
+router.get("/profile", authMiddleware, getUserProfile);
 
 // Logout route (requires authentication)
 router.post("/logout", authMiddleware, logoutUser);

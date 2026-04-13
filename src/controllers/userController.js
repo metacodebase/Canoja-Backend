@@ -530,6 +530,46 @@ const logoutUser = async (req, res) => {
   }
 };
 
+// Get current user profile (used for silent background refresh on app start)
+const getUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id || req.user._id;
+    const user = await User.findById(userId)
+      .select("-password -refreshToken -refreshTokenExpiresAt")
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    let businesses = [];
+    if (user.role === "operator" && user.licenseRecords?.length > 0) {
+      businesses = await LicenseRecord.find(
+        { _id: { $in: user.licenseRecords } },
+        {
+          business_name: 1,
+          claimed: 1,
+          canojaVerified: 1,
+          license_type: 1,
+          city: 1,
+          stateName: 1,
+        },
+      ).lean();
+    }
+
+    res.json({
+      success: true,
+      user: {
+        ...user,
+        businesses,
+      },
+    });
+  } catch (error) {
+    console.error("Get profile error:", error);
+    res.status(500).json({ success: false, error: "Failed to get profile" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -539,4 +579,5 @@ module.exports = {
   verifyOTPAndResetPassword,
   refreshAccessToken,
   logoutUser,
+  getUserProfile,
 };
