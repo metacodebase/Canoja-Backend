@@ -33,10 +33,16 @@ const generateDummyPassword = () => {
  * @param {string} licenseRecordId - License record ID to associate
  * @returns {Promise<Object>} Created user object and whether user was newly created
  */
-const autoRegisterUser = async (email, password, licenseRecordId = null) => {
+const autoRegisterUser = async (
+  email,
+  password,
+  licenseRecordId = null,
+  name = "",
+) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    // Link the new business to the existing account if not already linked
+    // Link the new business to the existing account if not already linked.
+    // Name is NOT updated — the operator's name from their first claim is kept.
     if (
       licenseRecordId &&
       !existingUser.licenseRecords
@@ -53,6 +59,7 @@ const autoRegisterUser = async (email, password, licenseRecordId = null) => {
 
   const user = new User({
     email,
+    name: name || "",
     password: hashedPassword,
     role: "operator",
     licenseRecords: licenseRecordId ? [licenseRecordId] : [],
@@ -277,6 +284,7 @@ const createClaimRequest = async (req, res) => {
         parsedContactPerson.email_address,
         dummyPassword,
         matchedRecord._id,
+        parsedContactPerson.full_name || "",
       );
 
       // Update LicenseRecord (don't set canojaVerified if shop is not already verified)
@@ -382,6 +390,7 @@ const createClaimRequest = async (req, res) => {
         parsedContactPerson.email_address,
         dummyPassword,
         matchedRecord._id,
+        parsedContactPerson.full_name || "",
       );
 
       // Update LicenseRecord (don't set canojaVerified if shop is not already verified)
@@ -720,6 +729,7 @@ const approveRequest = async (req, res) => {
       request.contact_person.email_address,
       dummyPassword,
       licenseRecordId,
+      request.contact_person.full_name || "",
     );
 
     // Handle LicenseRecord update if found

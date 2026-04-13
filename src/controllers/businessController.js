@@ -10,6 +10,20 @@ const { sendEmailChangeOTP } = require("../utils/emailService");
 const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
 
+// --- Helper: resolve the active business for an operator ---
+// Checks for X-Active-Business header so operators with multiple businesses
+// can specify which one they're managing. Falls back to the first claimed.
+async function getActiveBusiness(userId, req, select) {
+  const businessId = req.headers["x-active-business"];
+  const query = { claimedBy: userId, claimed: true };
+  if (businessId) {
+    query._id = businessId;
+  }
+  const q = LicenseRecord.findOne(query);
+  if (select) q.select(select);
+  return q;
+}
+
 // --- Get Business Dashboard Data ---
 async function getBusinessDashboard(req, res) {
   try {
@@ -22,11 +36,8 @@ async function getBusinessDashboard(req, res) {
       });
     }
 
-    // Find the business claimed by this user
-    const business = await LicenseRecord.findOne({
-      claimedBy: userId,
-      claimed: true,
-    });
+    // Find the active business for this user
+    const business = await getActiveBusiness(userId, req);
 
     if (!business) {
       return res.status(404).json({
@@ -125,10 +136,9 @@ async function getBusinessLocation(req, res) {
       });
     }
 
-    const business = await LicenseRecord.findOne({
-      claimedBy: userId,
-      claimed: true,
-    }).select(
+    const business = await getActiveBusiness(
+      userId,
+      req,
       "business_address city stateName postal_code country location latitude longitude",
     );
 
@@ -180,10 +190,9 @@ async function getBusinessProfile(req, res) {
       });
     }
 
-    const business = await LicenseRecord.findOne({
-      claimedBy: userId,
-      claimed: true,
-    }).select(
+    const business = await getActiveBusiness(
+      userId,
+      req,
       "business_name dba business_address business_phone_number contact_information website_or_social_media_link working_hours business_status description about",
     );
 
@@ -239,10 +248,7 @@ async function updateBusinessProfile(req, res) {
       });
     }
 
-    const business = await LicenseRecord.findOne({
-      claimedBy: userId,
-      claimed: true,
-    });
+    const business = await getActiveBusiness(userId, req);
 
     if (!business) {
       return res.status(404).json({
@@ -325,10 +331,7 @@ async function toggleBusinessVisibility(req, res) {
       });
     }
 
-    const business = await LicenseRecord.findOne({
-      claimedBy: userId,
-      claimed: true,
-    });
+    const business = await getActiveBusiness(userId, req);
 
     if (!business) {
       return res.status(404).json({
@@ -369,10 +372,7 @@ async function uploadMenu(req, res) {
       });
     }
 
-    const business = await LicenseRecord.findOne({
-      claimedBy: userId,
-      claimed: true,
-    });
+    const business = await getActiveBusiness(userId, req);
 
     if (!business) {
       return res.status(404).json({
@@ -424,10 +424,11 @@ async function getEngagementStats(req, res) {
       });
     }
 
-    const business = await LicenseRecord.findOne({
-      claimedBy: userId,
-      claimed: true,
-    }).select("view_count business_name");
+    const business = await getActiveBusiness(
+      userId,
+      req,
+      "view_count business_name",
+    );
 
     if (!business) {
       return res.status(404).json({
@@ -551,10 +552,7 @@ async function getAnalytics(req, res) {
         .json({ success: false, error: "period must be 7, 30, or 90" });
     }
 
-    const business = await LicenseRecord.findOne({
-      claimedBy: userId,
-      claimed: true,
-    }).select("_id business_name");
+    const business = await getActiveBusiness(userId, req, "_id business_name");
 
     if (!business) {
       return res
@@ -693,12 +691,10 @@ async function requestEmailChange(req, res) {
     // Check if email is already taken by another user
     const existing = await User.findOne({ email: new_email });
     if (existing && existing._id.toString() !== userId.toString()) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-          error: "This email is already in use by another account",
-        });
+      return res.status(409).json({
+        success: false,
+        error: "This email is already in use by another account",
+      });
     }
 
     const user = await User.findById(userId);
@@ -707,12 +703,10 @@ async function requestEmailChange(req, res) {
     }
 
     if (user.email === new_email) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "New email must be different from your current email",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "New email must be different from your current email",
+      });
     }
 
     // Invalidate existing email change OTPs for this user
@@ -737,12 +731,10 @@ async function requestEmailChange(req, res) {
       await sendEmailChangeOTP(new_email, otp);
     } catch (emailError) {
       console.error("Error sending email change OTP:", emailError);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          error: "Failed to send verification email. Please try again.",
-        });
+      return res.status(500).json({
+        success: false,
+        error: "Failed to send verification email. Please try again.",
+      });
     }
 
     res.json({
@@ -751,12 +743,10 @@ async function requestEmailChange(req, res) {
     });
   } catch (error) {
     console.error("Request email change error:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        error: "Failed to process email change request",
-      });
+    res.status(500).json({
+      success: false,
+      error: "Failed to process email change request",
+    });
   }
 }
 
@@ -778,12 +768,10 @@ async function confirmEmailChange(req, res) {
     });
 
     if (!otpRecord) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "No pending email change found. Please request a new code.",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "No pending email change found. Please request a new code.",
+      });
     }
 
     if (otpRecord.otp !== otp) {
@@ -801,12 +789,10 @@ async function confirmEmailChange(req, res) {
     if (taken && taken._id.toString() !== userId.toString()) {
       otpRecord.used = true;
       await otpRecord.save();
-      return res
-        .status(409)
-        .json({
-          success: false,
-          error: "This email has been taken by another account",
-        });
+      return res.status(409).json({
+        success: false,
+        error: "This email has been taken by another account",
+      });
     }
 
     await User.findByIdAndUpdate(userId, { email: newEmail });
