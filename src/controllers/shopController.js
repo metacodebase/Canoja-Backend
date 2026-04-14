@@ -1372,6 +1372,8 @@ async function getShopDetails(req, res) {
 async function getSpotlightShops(req, res) {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const skip = (page - 1) * limit;
     const userLat = req.query.lat ? parseFloat(req.query.lat) : null;
     const userLng = req.query.lng ? parseFloat(req.query.lng) : null;
 
@@ -1381,6 +1383,7 @@ async function getSpotlightShops(req, res) {
       visibility: { $ne: false },
     })
       .sort({ rating: -1, _id: -1 })
+      .skip(skip)
       .limit(limit + 1)
       .lean();
 
