@@ -190,4 +190,12 @@ router.get("/details/:shopId", shopController.getShopDetails);
  */
 router.get("/test-db", shopController.testDatabase);
 
+/**
+ * @route   GET /api/shops/spotlight
+ * @desc    Get featured/spotlight businesses (latest, sorted by rating)
+ * @access  Public
+ * @query   limit (default 20, max 50), lat, lng (optional, for distance calc)
+ */
+router.get("/spotlight", shopController.getSpotlightShops);
+
 module.exports = router;

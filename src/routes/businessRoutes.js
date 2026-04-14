@@ -144,4 +144,11 @@ router.post("/request-email-change", businessController.requestEmailChange);
  */
 router.post("/confirm-email-change", businessController.confirmEmailChange);
 
+/**
+ * @route   PUT /api/business/spotlight
+ * @desc    Toggle spotlight (featured) status for the operator's active business
+ * @access  Private
+ */
+router.put("/spotlight", businessController.toggleSpotlight);
+
 module.exports = router;

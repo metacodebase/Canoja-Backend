@@ -1368,6 +1368,47 @@ async function getShopDetails(req, res) {
   }
 }
 
+// --- Get Spotlight (featured) Shops ---
+async function getSpotlightShops(req, res) {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    const userLat = req.query.lat ? parseFloat(req.query.lat) : null;
+    const userLng = req.query.lng ? parseFloat(req.query.lng) : null;
+
+    // Fetch one extra to detect hasMore
+    const raw = await LicenseRecord.find({
+      featured: true,
+      visibility: { $ne: false },
+    })
+      .sort({ rating: -1, _id: -1 })
+      .limit(limit + 1)
+      .lean();
+
+    const hasMore = raw.length > limit;
+    const records = raw.slice(0, limit);
+    const total = await LicenseRecord.countDocuments({
+      featured: true,
+      visibility: { $ne: false },
+    });
+
+    const shops = records.map((shop) => formatShopData(shop, userLat, userLng));
+
+    return res.json({
+      success: true,
+      data: {
+        shops,
+        total,
+        has_more: hasMore,
+      },
+    });
+  } catch (error) {
+    console.error("getSpotlightShops error:", error);
+    return res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch spotlight shops" });
+  }
+}
+
 module.exports = {
   haversineDistance,
   determineRadius,
@@ -1378,6 +1419,7 @@ module.exports = {
   getSessionStatus,
   testDatabase,
   getShopDetails,
+  getSpotlightShops,
   formatShopData,
   applySearchFilters,
   buildDirectFilterQuery,

@@ -108,6 +108,7 @@ async function getBusinessDashboard(req, res) {
       business_id: business._id,
       business_name: business.business_name,
       menu_url: business.menu || null,
+      spotlight: business.featured || false,
     };
 
     res.json({
@@ -813,12 +814,55 @@ async function confirmEmailChange(req, res) {
   }
 }
 
+// --- Toggle Spotlight (featured) ---
+async function toggleSpotlight(req, res) {
+  try {
+    const userId = req.user?.id || req.user?._id;
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Authentication required" });
+    }
+
+    const { spotlight } = req.body;
+    if (typeof spotlight !== "boolean") {
+      return res
+        .status(400)
+        .json({ success: false, error: "spotlight must be a boolean" });
+    }
+
+    const business = await getActiveBusiness(userId, req);
+    if (!business) {
+      return res
+        .status(404)
+        .json({ success: false, error: "No business found for this user" });
+    }
+
+    business.featured = spotlight;
+    await business.save();
+
+    return res.json({
+      success: true,
+      message: spotlight
+        ? "Business added to Spotlight"
+        : "Business removed from Spotlight",
+      data: { spotlight },
+    });
+  } catch (error) {
+    console.error("toggleSpotlight error:", error);
+    return res
+      .status(500)
+      .json({ success: false, error: "Failed to update spotlight status" });
+  }
+}
+
 module.exports = {
   getBusinessDashboard,
   getBusinessLocation,
   getBusinessProfile,
   updateBusinessProfile,
   toggleBusinessVisibility,
+  toggleSpotlight,
   uploadMenu,
   getEngagementStats,
   recordView,
