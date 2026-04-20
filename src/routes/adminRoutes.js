@@ -16,4 +16,32 @@ router.patch("/users/:userId/toggle-status", adminController.toggleUserStatus);
 // Query params: status, business_type, page, limit
 router.get("/verification-history", adminController.listVerificationHistory);
 
+// ─── Phase 2 additions ────────────────────────────────────────────────────────
+
+// GET /api/admin/retailers
+// Query params: q, state, licenseStatus, verificationStatus, expirationWindow, page, limit, sort
+router.get("/retailers", adminController.listRetailers);
+
+// GET /api/admin/canoja-verified
+// Query params: q, status (active|expiringSoon|revoked), region, source, page, limit
+router.get("/canoja-verified", adminController.listCanojaVerified);
+
+// PATCH /api/admin/canoja-verified/:id/revoke
+router.patch(
+  "/canoja-verified/:id/revoke",
+  adminController.revokeVerifiedBadge,
+);
+
+// GET /api/admin/pending-verifications
+// Query params: q, region, submissionAge (lt24|24-72|gt72), page, limit
+router.get("/pending-verifications", adminController.listPendingVerifications);
+
+// GET /api/admin/pending-requests
+// Query params: requestType (claim|verify), status, page, limit
+router.get("/pending-requests", adminController.listPendingRequests);
+
+// GET /api/admin/audit-log
+// Query params: targetType, targetId, actorId, page, limit
+router.get("/audit-log", adminController.listAuditLog);
+
 module.exports = router;

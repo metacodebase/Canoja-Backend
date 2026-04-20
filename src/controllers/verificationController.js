@@ -1,6 +1,7 @@
 const VerificationRequest = require("../models/verificationRequest");
 const LicenseRecord = require("../models/licenseRecord");
 const User = require("../models/user");
+const AuditLog = require("../models/auditLog");
 const upload = require("../utils/s3Upload");
 const bcrypt = require("bcryptjs");
 const {
@@ -708,6 +709,7 @@ const approveRequest = async (req, res) => {
     // Update request status
     request.status = "approved";
     request.adminVerifiedRequired = false;
+    request.processedAt = new Date();
 
     // Find LicenseRecord by pharmacyId (stored when request was created)
     let licenseRecord = null;
@@ -796,6 +798,15 @@ const approveRequest = async (req, res) => {
     }
 
     await request.save();
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "approve_verification",
+      targetType: "VerificationRequest",
+      targetId: request._id,
+      before: { status: "pending" },
+      after: { status: "approved" },
+      metadata: { licenseRecordId, businessName: request.legal_business_name },
+    }).catch(() => {});
 
     // Build response message
     res.json({
@@ -834,10 +845,20 @@ const rejectRequest = async (req, res) => {
     }
 
     request.status = "rejected";
+    request.processedAt = new Date();
     if (reason) {
       request.notes = (request.notes || "") + `\nRejection reason: ${reason}`;
     }
     await request.save();
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "reject_verification",
+      targetType: "VerificationRequest",
+      targetId: request._id,
+      before: { status: "pending" },
+      after: { status: "rejected" },
+      metadata: { reason, businessName: request.legal_business_name },
+    }).catch(() => {});
 
     // Send rejection email
     try {

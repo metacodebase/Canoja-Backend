@@ -151,6 +151,32 @@ const licenseRecordSchema = new mongoose.Schema(
     menu: String, // URL to menu file (PDF or image)
     menuUploadedAt: { type: Date, default: null },
     view_count: { type: Number, default: 0 }, // Track engagement - number of views/clicks
+
+    // Admin Panel additions (Phase 2) — all optional, no defaults that affect existing data
+    lastVerifiedDate: { type: Date, default: null },
+    dataCompletenessScore: { type: Number, default: null }, // 0-100
+    sourceType: {
+      type: String,
+      enum: ["state_db", "manual", "ai_verified", null],
+      default: null,
+    },
+    riskFlag: {
+      type: String,
+      enum: ["low", "medium", "high", null],
+      default: null,
+    },
+    verificationLifecycle: [
+      {
+        status: String,
+        at: { type: Date, default: Date.now },
+        by: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          default: null,
+        },
+        note: String,
+      },
+    ],
   },
   {
     timestamps: true,

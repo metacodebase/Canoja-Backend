@@ -141,6 +141,11 @@ const verificationRequestSchema = new mongoose.Schema(
       type: Date,
     },
 
+    processedAt: {
+      type: Date,
+      default: null,
+    },
+
     // Submission metadata
     verification_metadata: {
       ip_address: String,
