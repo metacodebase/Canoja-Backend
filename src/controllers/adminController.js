@@ -2,6 +2,7 @@ const User = require("../models/user");
 const VerificationRequest = require("../models/verificationRequest");
 const LicenseRecord = require("../models/licenseRecord");
 const AuditLog = require("../models/auditLog");
+const RequestMessage = require("../models/requestMessage");
 
 async function listUsers(req, res) {
   try {
@@ -108,6 +109,8 @@ async function listRetailers(req, res) {
       licenseStatus,
       verificationStatus,
       expirationWindow,
+      minCompleteness,
+      sourceType,
       page = 1,
       limit = 50,
       sort = "createdAt_desc",
@@ -169,6 +172,13 @@ async function listRetailers(req, res) {
       if (expirationWindow === "30-90")
         filter.expiration_date = { $gte: d30, $lt: d90 };
     }
+
+    if (minCompleteness) {
+      const min = parseInt(minCompleteness);
+      if (!isNaN(min)) filter.dataCompletenessScore = { $gte: min };
+    }
+
+    if (sourceType) filter.sourceType = sourceType;
 
     const sortMap = {
       createdAt_desc: { createdAt: -1 },
@@ -247,6 +257,7 @@ async function listRetailers(req, res) {
       claimedCount,
       unclaimedCount,
       expiringSoonCount,
+      expiredByDateCount,
       dataGapsCount,
       pendingVRCount,
     ] = await Promise.all([
@@ -273,6 +284,10 @@ async function listRetailers(req, res) {
       // Expiring soon = license expiring within 30 days (not already expired)
       LicenseRecord.countDocuments({
         expiration_date: { $gte: now, $lt: d30 },
+      }),
+      // Expired by date = expiration_date is in the past
+      LicenseRecord.countDocuments({
+        expiration_date: { $lt: now },
       }),
       // Data gaps = no owner linked OR no contact phone
       LicenseRecord.countDocuments({
@@ -305,6 +320,7 @@ async function listRetailers(req, res) {
         claimedCount,
         unclaimedCount,
         expiringSoonCount,
+        expiredByDateCount,
         dataGapsCount,
         pendingVRCount,
         verifiedBreakdown: {
@@ -322,7 +338,17 @@ async function listRetailers(req, res) {
 // GET /api/admin/canoja-verified
 async function listCanojaVerified(req, res) {
   try {
-    const { q, status, region, source, page = 1, limit = 50 } = req.query;
+    const {
+      q,
+      status,
+      region,
+      source,
+      renewalStatus,
+      businessStatus,
+      hasMenu,
+      page = 1,
+      limit = 50,
+    } = req.query;
 
     const now = new Date();
     const d30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -330,6 +356,14 @@ async function listCanojaVerified(req, res) {
     const filter = { canojaVerified: true };
     if (region) filter.stateName = region;
     if (source) filter.sourceType = source;
+    if (businessStatus)
+      filter.business_status = new RegExp(businessStatus, "i");
+    if (hasMenu === "true")
+      filter.$or = [
+        { menu_link: { $exists: true, $ne: null, $ne: "" } },
+        { menu: { $exists: true, $ne: null, $ne: "" } },
+        { order_links: { $exists: true, $ne: null, $ne: "" } },
+      ];
     if (q) {
       const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
       filter.$and = [
@@ -353,42 +387,84 @@ async function listCanojaVerified(req, res) {
     } else if (status === "expiringSoon") {
       filter.expiration_date = { $gte: now, $lte: d30 };
     } else if (status === "revoked") {
-      // Revoked = not currently canoja verified but has been claimed/verified before
-      filter.canojaVerified = false;
-      filter.claimed = true;
-      filter.license_status = { $in: ["revoked", "expired", "inactive"] };
+      filter.expiration_date = { $lt: now };
+    }
+
+    if (renewalStatus === "due") {
+      filter.expiration_date = { $gte: now, $lte: d30 };
+    } else if (renewalStatus === "upcoming") {
+      const d60 = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
+      filter.expiration_date = { $gt: d30, $lte: d60 };
+    } else if (renewalStatus === "overdue") {
+      filter.expiration_date = { $lt: now };
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
+    const d60 = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
 
-    const [records, total] = await Promise.all([
+    // baseFilter excludes status/renewalStatus so sidebar counts always show full breakdown
+    const baseFilter = { canojaVerified: true };
+    if (region) baseFilter.stateName = region;
+    if (source) baseFilter.sourceType = source;
+    if (businessStatus)
+      baseFilter.business_status = new RegExp(businessStatus, "i");
+    if (hasMenu === "true") baseFilter.$or = filter.$or;
+    if (q) baseFilter.$and = filter.$and;
+
+    const withBase = (extra) => ({ $and: [baseFilter, extra] });
+
+    const [
+      records,
+      total,
+      activeCount,
+      expiringSoonCount,
+      revokedCount,
+      renewalDueCount,
+      renewalUpcomingCount,
+      renewalOverdueCount,
+      statesFacet,
+      viewsResult,
+      openNowCount,
+      deliveryCount,
+    ] = await Promise.all([
       LicenseRecord.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit)),
       LicenseRecord.countDocuments(filter),
+      LicenseRecord.countDocuments(
+        withBase({
+          $or: [
+            { expiration_date: { $gt: d30 } },
+            { expiration_date: null },
+            { expiration_date: { $exists: false } },
+          ],
+        }),
+      ),
+      LicenseRecord.countDocuments(
+        withBase({ expiration_date: { $gte: now, $lte: d30 } }),
+      ),
+      LicenseRecord.countDocuments(withBase({ expiration_date: { $lt: now } })),
+      LicenseRecord.countDocuments(
+        withBase({ expiration_date: { $gte: now, $lte: d30 } }),
+      ),
+      LicenseRecord.countDocuments(
+        withBase({ expiration_date: { $gt: d30, $lte: d60 } }),
+      ),
+      LicenseRecord.countDocuments(withBase({ expiration_date: { $lt: now } })),
+      LicenseRecord.distinct("stateName", { canojaVerified: true }),
+      LicenseRecord.aggregate([
+        { $match: baseFilter },
+        { $group: { _id: null, totalViews: { $sum: "$view_count" } } },
+      ]),
+      LicenseRecord.countDocuments({ ...baseFilter, business_status: "OPEN" }),
+      LicenseRecord.countDocuments({
+        ...baseFilter,
+        order_links: { $exists: true, $ne: null, $ne: "" },
+      }),
     ]);
 
-    // Summary stats (always computed against full dataset, ignoring current filters)
-    const [activeCount, expiringSoonCount, revokedCount] = await Promise.all([
-      LicenseRecord.countDocuments({
-        canojaVerified: true,
-        $or: [
-          { expiration_date: { $gt: d30 } },
-          { expiration_date: null },
-          { expiration_date: { $exists: false } },
-        ],
-      }),
-      LicenseRecord.countDocuments({
-        canojaVerified: true,
-        expiration_date: { $gte: now, $lte: d30 },
-      }),
-      LicenseRecord.countDocuments({
-        canojaVerified: false,
-        claimed: true,
-        license_status: { $in: ["revoked", "expired"] },
-      }),
-    ]);
+    const totalBadgeViews = viewsResult[0]?.totalViews || 0;
 
     res.json({
       success: true,
@@ -403,6 +479,15 @@ async function listCanojaVerified(req, res) {
         active: activeCount,
         expiringSoon: expiringSoonCount,
         revoked: revokedCount,
+        renewalDue: renewalDueCount,
+        renewalUpcoming: renewalUpcomingCount,
+        renewalOverdue: renewalOverdueCount,
+        totalBadgeViews,
+        openNow: openNowCount,
+        deliveryReady: deliveryCount,
+      },
+      facets: {
+        states: statesFacet.filter(Boolean).sort(),
       },
     });
   } catch (error) {
@@ -438,10 +523,19 @@ async function listPendingVerifications(req, res) {
     }
 
     if (region) {
-      filter["license_information.jurisdiction"] = new RegExp(
+      const regionRegex = new RegExp(
         region.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
         "i",
       );
+      filter.$and = [
+        ...(filter.$and || []),
+        {
+          $or: [
+            { "license_information.jurisdiction": regionRegex },
+            { "license_information.issuing_authority": regionRegex },
+          ],
+        },
+      ];
     }
 
     if (submissionAge) {
@@ -453,7 +547,23 @@ async function listPendingVerifications(req, res) {
       if (submissionAge === "gt72") filter.createdAt = { $lt: h72 };
     }
 
-    if (priority === "high") filter.adminVerifiedRequired = true;
+    if (priority) {
+      const pNow = new Date();
+      const ph72 = new Date(pNow.getTime() - 72 * 60 * 60 * 1000);
+      const ph24 = new Date(pNow.getTime() - 24 * 60 * 60 * 1000);
+      if (priority === "high") {
+        const highOr = {
+          $or: [{ adminVerifiedRequired: true }, { createdAt: { $lt: ph72 } }],
+        };
+        filter.$and = [...(filter.$and || []), highOr];
+      } else if (priority === "medium") {
+        filter.createdAt = { $gte: ph72, $lt: ph24 };
+        filter.adminVerifiedRequired = { $ne: true };
+      } else if (priority === "low") {
+        filter.createdAt = { $gte: ph24 };
+        filter.adminVerifiedRequired = { $ne: true };
+      }
+    }
     if (submissionType) filter.verification_method = submissionType; // "auto" | "manual"
     if (slaBreach === "true") {
       const h72 = new Date(Date.now() - 72 * 60 * 60 * 1000);
@@ -470,35 +580,72 @@ async function listPendingVerifications(req, res) {
 
     const now = new Date();
     const h72 = new Date(now.getTime() - 72 * 60 * 60 * 1000);
+    const h24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-    const [requests, total, slaBreaches, highPriority, avgResult] =
-      await Promise.all([
-        VerificationRequest.find(filter)
-          .sort({ createdAt: 1 }) // oldest first — queue order
-          .skip(skip)
-          .limit(parseInt(limit)),
-        VerificationRequest.countDocuments(filter),
-        VerificationRequest.countDocuments({
-          status: "pending",
-          createdAt: { $lt: h72 },
+    // Combine current filter with an extra condition using $and so existing conditions aren't clobbered
+    const withFilter = (extra) => ({ $and: [filter, extra] });
+
+    const [
+      requests,
+      total,
+      slaBreaches,
+      highPriority,
+      lt24Count,
+      between24and72Count,
+      missingDocsCount,
+      jurisdictions,
+      avgResult,
+    ] = await Promise.all([
+      VerificationRequest.find(filter)
+        .sort({ createdAt: 1 }) // oldest first — queue order
+        .skip(skip)
+        .limit(parseInt(limit)),
+      VerificationRequest.countDocuments(filter),
+      VerificationRequest.countDocuments(
+        withFilter({ createdAt: { $lt: h72 } }),
+      ),
+      VerificationRequest.countDocuments(
+        withFilter({
+          $or: [{ adminVerifiedRequired: true }, { createdAt: { $lt: h72 } }],
         }),
-        VerificationRequest.countDocuments({
-          status: "pending",
-          adminVerifiedRequired: true,
-        }),
-        VerificationRequest.aggregate([
-          {
-            $match: {
-              status: { $in: ["approved", "rejected"] },
-              processedAt: { $exists: true, $ne: null },
+      ),
+      VerificationRequest.countDocuments(
+        withFilter({ createdAt: { $gte: h24 } }),
+      ),
+      VerificationRequest.countDocuments(
+        withFilter({ createdAt: { $gte: h72, $lt: h24 } }),
+      ),
+      VerificationRequest.countDocuments(
+        withFilter({
+          $or: [
+            {
+              "uploaded_documents.state_license_document": { $in: [null, ""] },
             },
+            { "uploaded_documents.state_license_document": { $exists: false } },
+          ],
+        }),
+      ),
+      Promise.all([
+        VerificationRequest.distinct("license_information.jurisdiction", {
+          status: "pending",
+        }),
+        VerificationRequest.distinct("license_information.issuing_authority", {
+          status: "pending",
+        }),
+      ]).then(([jur, auth]) => [...new Set([...jur, ...auth])]),
+      VerificationRequest.aggregate([
+        {
+          $match: {
+            status: { $in: ["approved", "rejected"] },
+            processedAt: { $exists: true, $ne: null },
           },
-          {
-            $project: { diffMs: { $subtract: ["$processedAt", "$createdAt"] } },
-          },
-          { $group: { _id: null, avgMs: { $avg: "$diffMs" } } },
-        ]),
-      ]);
+        },
+        {
+          $project: { diffMs: { $subtract: ["$processedAt", "$createdAt"] } },
+        },
+        { $group: { _id: null, avgMs: { $avg: "$diffMs" } } },
+      ]),
+    ]);
 
     const avgMs = avgResult[0]?.avgMs || null;
     const avgTimeToVerify =
@@ -518,12 +665,16 @@ async function listPendingVerifications(req, res) {
         pages: Math.ceil(total / parseInt(limit)),
       },
       stats: {
-        pendingTotal: await VerificationRequest.countDocuments({
-          status: "pending",
-        }),
+        pendingTotal: total,
         highPriority,
         slaBreaches,
+        lt24Count,
+        between24and72Count,
+        missingDocsCount,
         avgTimeToVerify,
+      },
+      facets: {
+        jurisdictions: jurisdictions.filter(Boolean).sort(),
       },
     });
   } catch (error) {
@@ -537,7 +688,7 @@ async function listPendingRequests(req, res) {
     const { requestType, status, q, page = 1, limit = 50 } = req.query;
 
     const filter = {};
-    filter.status = status || "pending";
+    if (status) filter.status = status;
 
     if (q) {
       const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
@@ -554,25 +705,103 @@ async function listPendingRequests(req, res) {
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const [requests, total, claimCount, verifyCount] = await Promise.all([
+    // Base filter: search only, no status/type — so sidebar counts are always global across all statuses/types
+    const baseFilter = q ? { $or: filter.$or } : {};
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - 7);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const [
+      requests,
+      total,
+      claimCount,
+      verifyCount,
+      pendingCount,
+      approvedCount,
+      rejectedCount,
+      autoVerifiedCount,
+      newTodayCount,
+      convertedThisWeekCount,
+    ] = await Promise.all([
       VerificationRequest.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit)),
       VerificationRequest.countDocuments(filter),
       VerificationRequest.countDocuments({
-        status: "pending",
+        ...baseFilter,
         claimRequested: true,
       }),
       VerificationRequest.countDocuments({
-        status: "pending",
+        ...baseFilter,
         verifyRequested: true,
+      }),
+      VerificationRequest.countDocuments({ ...baseFilter, status: "pending" }),
+      VerificationRequest.countDocuments({ ...baseFilter, status: "approved" }),
+      VerificationRequest.countDocuments({ ...baseFilter, status: "rejected" }),
+      VerificationRequest.countDocuments({
+        ...baseFilter,
+        status: "auto_verified",
+      }),
+      VerificationRequest.countDocuments({
+        ...baseFilter,
+        createdAt: { $gte: todayStart },
+      }),
+      VerificationRequest.countDocuments({
+        ...baseFilter,
+        status: "approved",
+        processedAt: { $gte: weekStart },
       }),
     ]);
 
+    // Duplicate detection — flag VRs that share license_number or business_name with another pending request
+    const requestIds = requests.map((r) => r._id);
+    const licenseNums = requests
+      .map((r) => r.license_information?.license_number)
+      .filter(Boolean);
+    const businessNames = requests
+      .map((r) => r.legal_business_name)
+      .filter(Boolean);
+
+    // Flag if another PENDING request shares the same business name or license number
+    const otherPending = await VerificationRequest.find({
+      status: "pending",
+      _id: { $nin: requestIds },
+      $or: [
+        ...(licenseNums.length
+          ? [{ "license_information.license_number": { $in: licenseNums } }]
+          : []),
+        ...(businessNames.length
+          ? [{ legal_business_name: { $in: businessNames } }]
+          : []),
+      ],
+    })
+      .select("license_information.license_number legal_business_name")
+      .lean();
+
+    const dupLicenses = new Set(
+      otherPending
+        .map((r) => r.license_information?.license_number)
+        .filter(Boolean),
+    );
+    const dupNames = new Set(
+      otherPending.map((r) => r.legal_business_name).filter(Boolean),
+    );
+
+    const enrichedRequests = requests.map((r) => ({
+      ...r.toObject(),
+      duplicateFlag:
+        (r.license_information?.license_number &&
+          dupLicenses.has(r.license_information.license_number)) ||
+        (r.legal_business_name && dupNames.has(r.legal_business_name)),
+    }));
+
     res.json({
       success: true,
-      data: requests,
+      data: enrichedRequests,
       pagination: {
         total,
         page: parseInt(page),
@@ -580,11 +809,17 @@ async function listPendingRequests(req, res) {
         pages: Math.ceil(total / parseInt(limit)),
       },
       stats: {
-        openRequests: await VerificationRequest.countDocuments({
-          status: "pending",
-        }),
+        openRequests: total,
         claimBusiness: claimCount,
         verifyBusiness: verifyCount,
+        duplicateSignals: enrichedRequests.filter((r) => r.duplicateFlag)
+          .length,
+        pendingCount,
+        approvedCount,
+        rejectedCount,
+        autoVerifiedCount,
+        newTodayCount,
+        convertedThisWeekCount,
       },
     });
   } catch (error) {
@@ -595,12 +830,20 @@ async function listPendingRequests(req, res) {
 // GET /api/admin/audit-log?targetType=&targetId=&page=
 async function listAuditLog(req, res) {
   try {
-    const { targetType, targetId, actorId, page = 1, limit = 50 } = req.query;
+    const {
+      targetType,
+      targetId,
+      actorId,
+      actions,
+      page = 1,
+      limit = 50,
+    } = req.query;
 
     const filter = {};
     if (targetType) filter.targetType = targetType;
     if (targetId) filter.targetId = targetId;
     if (actorId) filter.actor = actorId;
+    if (actions) filter.action = { $in: actions.split(",") };
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
@@ -623,6 +866,133 @@ async function listAuditLog(req, res) {
         pages: Math.ceil(total / parseInt(limit)),
       },
     });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// POST /api/admin/retailers
+async function createRetailer(req, res) {
+  try {
+    const {
+      business_name,
+      license_number,
+      stateName,
+      city,
+      business_address,
+      license_type,
+      license_status,
+      expiration_date,
+      sourceType,
+      phone,
+      email,
+    } = req.body;
+
+    if (!business_name) {
+      return res
+        .status(400)
+        .json({ success: false, error: "business_name is required" });
+    }
+
+    const record = await LicenseRecord.create({
+      business_name,
+      license_number: license_number || "",
+      stateName: stateName || "",
+      city: city || "",
+      business_address: business_address || "",
+      license_type: license_type || "",
+      license_status: license_status || "active",
+      expiration_date: expiration_date ? new Date(expiration_date) : null,
+      sourceType: sourceType || "manual",
+      contact_information: {
+        phone: phone || "",
+        email: email || "",
+      },
+    });
+
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "create_retailer",
+      targetType: "LicenseRecord",
+      targetId: record._id,
+      after: {
+        business_name: record.business_name,
+        license_number: record.license_number,
+      },
+    }).catch(() => {});
+
+    res.status(201).json({ success: true, data: record });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// PATCH /api/admin/pending-verifications/:id/escalate
+async function escalatePendingVerification(req, res) {
+  try {
+    const request = await VerificationRequest.findById(req.params.id);
+    if (!request)
+      return res
+        .status(404)
+        .json({ success: false, error: "Request not found" });
+
+    const { note } = req.body;
+    request.adminVerifiedRequired = true;
+    if (note) request.notes = note;
+    await request.save();
+
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "escalate_verification",
+      targetType: "VerificationRequest",
+      targetId: request._id,
+      after: { adminVerifiedRequired: true },
+      metadata: { note: note || "", businessName: request.legal_business_name },
+    }).catch(() => {});
+
+    res.json({ success: true, message: "Request escalated to high priority" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// POST /api/admin/canoja-verified/issue
+async function issueVerification(req, res) {
+  try {
+    const { id, expiration_date } = req.body;
+    if (!id)
+      return res.status(400).json({ success: false, error: "id is required" });
+
+    const record = await LicenseRecord.findById(id);
+    if (!record)
+      return res
+        .status(404)
+        .json({ success: false, error: "Record not found" });
+
+    record.canojaVerified = true;
+    record.lastVerifiedDate = new Date();
+    if (expiration_date) record.expiration_date = new Date(expiration_date);
+    record.verificationLifecycle = [
+      ...(record.verificationLifecycle || []),
+      {
+        status: "issued",
+        at: new Date(),
+        by: req.user._id,
+        note: "Issued by admin",
+      },
+    ];
+    await record.save();
+
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "issue_verified_badge",
+      targetType: "LicenseRecord",
+      targetId: record._id,
+      after: { canojaVerified: true, expiration_date: record.expiration_date },
+      metadata: { businessName: record.business_name },
+    }).catch(() => {});
+
+    res.status(201).json({ success: true, data: record });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -656,15 +1026,195 @@ async function revokeVerifiedBadge(req, res) {
   }
 }
 
+// PATCH /api/admin/canoja-verified/:id/renew
+async function renewCanojaVerified(req, res) {
+  try {
+    const record = await LicenseRecord.findById(req.params.id);
+    if (!record)
+      return res
+        .status(404)
+        .json({ success: false, error: "Record not found" });
+
+    const { expiration_date } = req.body;
+    const wasCanojaVerified = record.canojaVerified;
+    record.canojaVerified = true;
+    record.lastVerifiedDate = new Date();
+    if (expiration_date) record.expiration_date = new Date(expiration_date);
+    record.verificationLifecycle = [
+      ...(record.verificationLifecycle || []),
+      {
+        status: "renewed",
+        at: new Date(),
+        by: req.user._id,
+        note: expiration_date
+          ? `New expiry: ${expiration_date}`
+          : "Renewed by admin",
+      },
+    ];
+    await record.save();
+
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "renew_verified_badge",
+      targetType: "LicenseRecord",
+      targetId: record._id,
+      before: { canojaVerified: wasCanojaVerified },
+      after: { canojaVerified: true, expiration_date: record.expiration_date },
+      metadata: { businessName: record.business_name },
+    }).catch(() => {});
+
+    res.json({ success: true, message: "Badge renewed", data: record });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// GET /api/admin/requests/:id/messages
+async function listRequestMessages(req, res) {
+  try {
+    const messages = await RequestMessage.find({
+      requestId: req.params.id,
+    }).sort({ createdAt: 1 });
+    res.json({ success: true, data: messages });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// POST /api/admin/requests/:id/messages
+async function createRequestMessage(req, res) {
+  try {
+    const { body } = req.body;
+    if (!body?.trim())
+      return res
+        .status(400)
+        .json({ success: false, error: "Message body is required" });
+
+    const message = await RequestMessage.create({
+      requestId: req.params.id,
+      body: body.trim(),
+      fromAdmin: true,
+      senderName: req.user?.name || "Admin",
+    });
+    res.status(201).json({ success: true, data: message });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// POST /api/admin/pending-requests
+async function createPendingRequest(req, res) {
+  try {
+    const {
+      legal_business_name,
+      physical_address,
+      business_phone_number,
+      website_or_social_media_link,
+      business_type,
+      requestType, // "claim" | "verify"
+      contact_person,
+      license_information,
+      notes,
+    } = req.body;
+
+    if (!legal_business_name)
+      return res
+        .status(400)
+        .json({ success: false, error: "legal_business_name is required" });
+    if (!physical_address)
+      return res
+        .status(400)
+        .json({ success: false, error: "physical_address is required" });
+    if (!business_phone_number)
+      return res
+        .status(400)
+        .json({ success: false, error: "business_phone_number is required" });
+    if (!contact_person?.full_name)
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "contact_person.full_name is required",
+        });
+    if (!contact_person?.email_address)
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "contact_person.email_address is required",
+        });
+    if (!contact_person?.phone_number)
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "contact_person.phone_number is required",
+        });
+    if (!contact_person?.role_or_position)
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "contact_person.role_or_position is required",
+        });
+
+    const request = await VerificationRequest.create({
+      legal_business_name,
+      physical_address,
+      business_phone_number,
+      website_or_social_media_link: website_or_social_media_link || "",
+      business_type: business_type || undefined,
+      claimRequested: requestType === "claim",
+      verifyRequested: requestType === "verify",
+      contact_person: {
+        full_name: contact_person.full_name,
+        email_address: contact_person.email_address,
+        phone_number: contact_person.phone_number,
+        role_or_position: contact_person.role_or_position,
+      },
+      license_information: license_information || {},
+      notes: notes || "",
+      status: "pending",
+      verification_method: "manual",
+      adminVerifiedRequired: true,
+      ownership_attestation: true,
+      leadSource: "Admin Outreach",
+      verification_metadata: {
+        submission_timestamp: new Date(),
+      },
+    });
+
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "create_pending_request",
+      targetType: "VerificationRequest",
+      targetId: request._id,
+      after: { legal_business_name, requestType },
+      metadata: { createdByAdmin: true },
+    }).catch(() => {});
+
+    res.status(201).json({ success: true, data: request });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
 module.exports = {
   listUsers,
   toggleUserStatus,
   listVerificationHistory,
   // Phase 2 additions
   listRetailers,
+  createRetailer,
   listCanojaVerified,
+  issueVerification,
   listPendingVerifications,
+  escalatePendingVerification,
   listPendingRequests,
+  createPendingRequest,
   listAuditLog,
   revokeVerifiedBadge,
+  renewCanojaVerified,
+  listRequestMessages,
+  createRequestMessage,
 };

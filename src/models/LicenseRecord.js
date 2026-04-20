@@ -183,6 +183,27 @@ const licenseRecordSchema = new mongoose.Schema(
   },
 );
 
+// Compute dataCompletenessScore before every save
+licenseRecordSchema.pre("save", function (next) {
+  const fields = [
+    this.business_name,
+    this.license_number,
+    this.stateName,
+    this.city,
+    this.business_address,
+    this.contact_information?.phone,
+    this.contact_information?.email,
+    this.expiration_date,
+    this.license_type,
+    this.owner?.name,
+  ];
+  const filled = fields.filter(
+    (v) => v !== null && v !== undefined && v !== "",
+  ).length;
+  this.dataCompletenessScore = Math.round((filled / fields.length) * 100);
+  next();
+});
+
 // Geospatial index
 licenseRecordSchema.index({ location: "2dsphere" });
 

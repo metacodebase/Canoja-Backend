@@ -141,6 +141,12 @@ const verificationRequestSchema = new mongoose.Schema(
       type: Date,
     },
 
+    leadSource: {
+      type: String,
+      enum: ["Website CTA", "Admin Outreach", "Direct", "Referral", "Other"],
+      default: "Website CTA",
+    },
+
     processedAt: {
       type: Date,
       default: null,
