@@ -474,6 +474,44 @@ const sendBusinessLinkedEmail = async (toEmail, businessName) => {
   }
 };
 
+const sendAdminMessageEmail = async (toEmail, businessName, messageBody) => {
+  try {
+    const transporter = createTransporter();
+    if (!transporter) {
+      console.log(
+        "Email service not configured. Skipping admin message email.",
+      );
+      return { success: false, message: "Email service not configured" };
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: toEmail,
+      subject: `Canoja - Message regarding your request for ${businessName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #10b981;">Message from Canoja Admin</h2>
+          <p>Hello,</p>
+          <p>You have received a message regarding your request for <strong>${businessName}</strong>:</p>
+          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+            <p style="margin: 0; color: #1f2937;">${messageBody}</p>
+          </div>
+          <p>If you have any questions, please contact our support team.</p>
+          <p>Best regards,<br>The Canoja Team</p>
+        </div>
+      `,
+      text: `Message from Canoja Admin\n\nRegarding your request for ${businessName}:\n\n${messageBody}\n\nBest regards,\nThe Canoja Team`,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Admin message email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending admin message email:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendVerificationEmail,
   sendPendingReviewEmail,
@@ -482,4 +520,5 @@ module.exports = {
   sendPasswordResetOTP,
   sendEmailChangeOTP,
   sendBusinessLinkedEmail,
+  sendAdminMessageEmail,
 };

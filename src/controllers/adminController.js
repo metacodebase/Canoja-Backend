@@ -3,6 +3,7 @@ const VerificationRequest = require("../models/verificationRequest");
 const LicenseRecord = require("../models/licenseRecord");
 const AuditLog = require("../models/auditLog");
 const RequestMessage = require("../models/requestMessage");
+const { sendAdminMessageEmail } = require("../utils/emailService");
 
 async function listUsers(req, res) {
   try {
@@ -346,6 +347,9 @@ async function listCanojaVerified(req, res) {
       renewalStatus,
       businessStatus,
       hasMenu,
+      minRating,
+      licenseStatus,
+      serviceType,
       page = 1,
       limit = 50,
     } = req.query;
@@ -358,6 +362,27 @@ async function listCanojaVerified(req, res) {
     if (source) filter.sourceType = source;
     if (businessStatus)
       filter.business_status = new RegExp(businessStatus, "i");
+    if (minRating) filter.rating = { $gte: parseFloat(minRating) };
+    if (licenseStatus === "Inactive" || licenseStatus === "Expired") {
+      filter.expiration_date = { $lt: now };
+    } else if (licenseStatus === "Active") {
+      filter.$and = [
+        ...(filter.$and || []),
+        {
+          $or: [
+            { expiration_date: { $gt: now } },
+            { expiration_date: null },
+            { expiration_date: { $exists: false } },
+          ],
+        },
+      ];
+    } else if (licenseStatus) {
+      filter.license_status = new RegExp(`^${licenseStatus}$`, "i");
+    }
+    if (serviceType === "delivery")
+      filter.subtypes = { $elemMatch: { $regex: /delivery/i } };
+    if (serviceType === "pickup")
+      filter.subtypes = { $elemMatch: { $regex: /pickup|pick.up/i } };
     if (hasMenu === "true")
       filter.$or = [
         { menu_link: { $exists: true, $ne: null, $ne: "" } },
@@ -408,6 +433,27 @@ async function listCanojaVerified(req, res) {
     if (source) baseFilter.sourceType = source;
     if (businessStatus)
       baseFilter.business_status = new RegExp(businessStatus, "i");
+    if (minRating) baseFilter.rating = { $gte: parseFloat(minRating) };
+    if (licenseStatus === "Inactive" || licenseStatus === "Expired") {
+      baseFilter.expiration_date = { $lt: now };
+    } else if (licenseStatus === "Active") {
+      baseFilter.$and = [
+        ...(baseFilter.$and || []),
+        {
+          $or: [
+            { expiration_date: { $gt: now } },
+            { expiration_date: null },
+            { expiration_date: { $exists: false } },
+          ],
+        },
+      ];
+    } else if (licenseStatus) {
+      baseFilter.license_status = new RegExp(`^${licenseStatus}$`, "i");
+    }
+    if (serviceType === "delivery")
+      baseFilter.subtypes = { $elemMatch: { $regex: /delivery/i } };
+    if (serviceType === "pickup")
+      baseFilter.subtypes = { $elemMatch: { $regex: /pickup|pick.up/i } };
     if (hasMenu === "true") baseFilter.$or = filter.$or;
     if (q) baseFilter.$and = filter.$and;
 
@@ -426,6 +472,7 @@ async function listCanojaVerified(req, res) {
       viewsResult,
       openNowCount,
       deliveryCount,
+      avgRatingResult,
     ] = await Promise.all([
       LicenseRecord.find(filter)
         .sort({ createdAt: -1 })
@@ -452,7 +499,12 @@ async function listCanojaVerified(req, res) {
         withBase({ expiration_date: { $gt: d30, $lte: d60 } }),
       ),
       LicenseRecord.countDocuments(withBase({ expiration_date: { $lt: now } })),
-      LicenseRecord.distinct("stateName", { canojaVerified: true }),
+      LicenseRecord.aggregate([
+        { $match: { canojaVerified: true } },
+        { $group: { _id: "$stateName", count: { $sum: 1 } } },
+        { $match: { _id: { $ne: null, $ne: "" } } },
+        { $sort: { count: -1 } },
+      ]),
       LicenseRecord.aggregate([
         { $match: baseFilter },
         { $group: { _id: null, totalViews: { $sum: "$view_count" } } },
@@ -460,11 +512,27 @@ async function listCanojaVerified(req, res) {
       LicenseRecord.countDocuments({ ...baseFilter, business_status: "OPEN" }),
       LicenseRecord.countDocuments({
         ...baseFilter,
-        order_links: { $exists: true, $ne: null, $ne: "" },
+        $or: [
+          { order_links: { $exists: true, $not: { $in: [null, ""] } } },
+          { subtypes: { $elemMatch: { $regex: /delivery/i } } },
+        ],
       }),
+      LicenseRecord.aggregate([
+        {
+          $match: {
+            ...baseFilter,
+            rating: { $gt: 0, $exists: true, $ne: null },
+          },
+        },
+        { $group: { _id: null, avg: { $avg: "$rating" } } },
+      ]),
     ]);
 
     const totalBadgeViews = viewsResult[0]?.totalViews || 0;
+    const avgRating =
+      avgRatingResult[0]?.avg != null
+        ? parseFloat(avgRatingResult[0].avg.toFixed(1))
+        : null;
 
     res.json({
       success: true,
@@ -485,9 +553,10 @@ async function listCanojaVerified(req, res) {
         totalBadgeViews,
         openNow: openNowCount,
         deliveryReady: deliveryCount,
+        avgRating,
       },
       facets: {
-        states: statesFacet.filter(Boolean).sort(),
+        states: statesFacet,
       },
     });
   } catch (error) {
@@ -523,16 +592,71 @@ async function listPendingVerifications(req, res) {
     }
 
     if (region) {
-      const regionRegex = new RegExp(
-        region.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        "i",
-      );
+      const STATE_NAMES = {
+        AL: "Alabama",
+        AK: "Alaska",
+        AZ: "Arizona",
+        AR: "Arkansas",
+        CA: "California",
+        CO: "Colorado",
+        CT: "Connecticut",
+        DE: "Delaware",
+        FL: "Florida",
+        GA: "Georgia",
+        HI: "Hawaii",
+        ID: "Idaho",
+        IL: "Illinois",
+        IN: "Indiana",
+        IA: "Iowa",
+        KS: "Kansas",
+        KY: "Kentucky",
+        LA: "Louisiana",
+        ME: "Maine",
+        MD: "Maryland",
+        MA: "Massachusetts",
+        MI: "Michigan",
+        MN: "Minnesota",
+        MS: "Mississippi",
+        MO: "Missouri",
+        MT: "Montana",
+        NE: "Nebraska",
+        NV: "Nevada",
+        NH: "New Hampshire",
+        NJ: "New Jersey",
+        NM: "New Mexico",
+        NY: "New York",
+        NC: "North Carolina",
+        ND: "North Dakota",
+        OH: "Ohio",
+        OK: "Oklahoma",
+        OR: "Oregon",
+        PA: "Pennsylvania",
+        RI: "Rhode Island",
+        SC: "South Carolina",
+        SD: "South Dakota",
+        TN: "Tennessee",
+        TX: "Texas",
+        UT: "Utah",
+        VT: "Vermont",
+        VA: "Virginia",
+        WA: "Washington",
+        WV: "West Virginia",
+        WI: "Wisconsin",
+        WY: "Wyoming",
+        DC: "District of Columbia",
+      };
+      const fullName = STATE_NAMES[region.toUpperCase()];
+      const pattern = fullName
+        ? `\\b(${region}|${fullName})\\b`
+        : `\\b${region.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`;
+      const regionRegex = new RegExp(pattern, "i");
       filter.$and = [
         ...(filter.$and || []),
         {
           $or: [
             { "license_information.jurisdiction": regionRegex },
             { "license_information.issuing_authority": regionRegex },
+            { physical_address: regionRegex },
           ],
         },
       ];
@@ -593,7 +717,7 @@ async function listPendingVerifications(req, res) {
       lt24Count,
       between24and72Count,
       missingDocsCount,
-      jurisdictions,
+      stateFacet,
       avgResult,
     ] = await Promise.all([
       VerificationRequest.find(filter)
@@ -625,14 +749,87 @@ async function listPendingVerifications(req, res) {
           ],
         }),
       ),
-      Promise.all([
-        VerificationRequest.distinct("license_information.jurisdiction", {
-          status: "pending",
-        }),
-        VerificationRequest.distinct("license_information.issuing_authority", {
-          status: "pending",
-        }),
-      ]).then(([jur, auth]) => [...new Set([...jur, ...auth])]),
+      VerificationRequest.aggregate([
+        { $match: { status: "pending" } },
+        {
+          $addFields: {
+            _stateMatch: {
+              $regexFind: {
+                input: { $ifNull: ["$physical_address", ""] },
+                regex: ",\\s*([A-Z]{2})\\b",
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            _state: {
+              $ifNull: [{ $arrayElemAt: ["$_stateMatch.captures", 0] }, null],
+            },
+          },
+        },
+        {
+          $match: {
+            _state: {
+              $in: [
+                "AL",
+                "AK",
+                "AZ",
+                "AR",
+                "CA",
+                "CO",
+                "CT",
+                "DE",
+                "FL",
+                "GA",
+                "HI",
+                "ID",
+                "IL",
+                "IN",
+                "IA",
+                "KS",
+                "KY",
+                "LA",
+                "ME",
+                "MD",
+                "MA",
+                "MI",
+                "MN",
+                "MS",
+                "MO",
+                "MT",
+                "NE",
+                "NV",
+                "NH",
+                "NJ",
+                "NM",
+                "NY",
+                "NC",
+                "ND",
+                "OH",
+                "OK",
+                "OR",
+                "PA",
+                "RI",
+                "SC",
+                "SD",
+                "TN",
+                "TX",
+                "UT",
+                "VT",
+                "VA",
+                "WA",
+                "WV",
+                "WI",
+                "WY",
+                "DC",
+              ],
+            },
+          },
+        },
+        { $group: { _id: "$_state", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]),
       VerificationRequest.aggregate([
         {
           $match: {
@@ -674,7 +871,7 @@ async function listPendingVerifications(req, res) {
         avgTimeToVerify,
       },
       facets: {
-        jurisdictions: jurisdictions.filter(Boolean).sort(),
+        states: stateFacet,
       },
     });
   } catch (error) {
@@ -685,7 +882,16 @@ async function listPendingVerifications(req, res) {
 // GET /api/admin/pending-requests
 async function listPendingRequests(req, res) {
   try {
-    const { requestType, status, q, page = 1, limit = 50 } = req.query;
+    const {
+      requestType,
+      status,
+      q,
+      market,
+      minScore,
+      maxScore,
+      page = 1,
+      limit = 50,
+    } = req.query;
 
     const filter = {};
     if (status) filter.status = status;
@@ -703,16 +909,301 @@ async function listPendingRequests(req, res) {
     if (requestType === "claim") filter.claimRequested = true;
     if (requestType === "verify") filter.verifyRequested = true;
 
+    if (market) {
+      const STATE_NAMES = {
+        AL: "Alabama",
+        AK: "Alaska",
+        AZ: "Arizona",
+        AR: "Arkansas",
+        CA: "California",
+        CO: "Colorado",
+        CT: "Connecticut",
+        DE: "Delaware",
+        FL: "Florida",
+        GA: "Georgia",
+        HI: "Hawaii",
+        ID: "Idaho",
+        IL: "Illinois",
+        IN: "Indiana",
+        IA: "Iowa",
+        KS: "Kansas",
+        KY: "Kentucky",
+        LA: "Louisiana",
+        ME: "Maine",
+        MD: "Maryland",
+        MA: "Massachusetts",
+        MI: "Michigan",
+        MN: "Minnesota",
+        MS: "Mississippi",
+        MO: "Missouri",
+        MT: "Montana",
+        NE: "Nebraska",
+        NV: "Nevada",
+        NH: "New Hampshire",
+        NJ: "New Jersey",
+        NM: "New Mexico",
+        NY: "New York",
+        NC: "North Carolina",
+        ND: "North Dakota",
+        OH: "Ohio",
+        OK: "Oklahoma",
+        OR: "Oregon",
+        PA: "Pennsylvania",
+        RI: "Rhode Island",
+        SC: "South Carolina",
+        SD: "South Dakota",
+        TN: "Tennessee",
+        TX: "Texas",
+        UT: "Utah",
+        VT: "Vermont",
+        VA: "Virginia",
+        WA: "Washington",
+        WV: "West Virginia",
+        WI: "Wisconsin",
+        WY: "Wyoming",
+        DC: "District of Columbia",
+      };
+      const fullName = STATE_NAMES[market.toUpperCase()];
+      const pattern = fullName
+        ? `\\b(${market}|${fullName})\\b`
+        : `\\b${market}\\b`;
+      filter.physical_address = new RegExp(pattern, "i");
+    }
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Base filter: search only, no status/type — so sidebar counts are always global across all statuses/types
     const baseFilter = q ? { $or: filter.$or } : {};
+    if (market) baseFilter.physical_address = filter.physical_address; // same regex
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - 7);
     weekStart.setHours(0, 0, 0, 0);
+
+    // Completeness score pipeline — mirrors client-side computeCompleteness (10 fields)
+    const scoreAddField = {
+      $addFields: {
+        _score: {
+          $multiply: [
+            {
+              $divide: [
+                {
+                  $add: [
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            { $ifNull: ["$legal_business_name", false] },
+                            { $ne: ["$legal_business_name", ""] },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            { $ifNull: ["$physical_address", false] },
+                            { $ne: ["$physical_address", ""] },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            { $ifNull: ["$business_phone_number", false] },
+                            { $ne: ["$business_phone_number", ""] },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            {
+                              $ifNull: ["$website_or_social_media_link", false],
+                            },
+                            { $ne: ["$website_or_social_media_link", ""] },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            { $ifNull: ["$contact_person.full_name", false] },
+                            { $ne: ["$contact_person.full_name", ""] },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            {
+                              $ifNull: ["$contact_person.email_address", false],
+                            },
+                            { $ne: ["$contact_person.email_address", ""] },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            {
+                              $ifNull: [
+                                "$contact_person.role_or_position",
+                                false,
+                              ],
+                            },
+                            { $ne: ["$contact_person.role_or_position", ""] },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            {
+                              $ifNull: [
+                                "$contact_person.government_issued_id_document",
+                                false,
+                              ],
+                            },
+                            {
+                              $ne: [
+                                "$contact_person.government_issued_id_document",
+                                "",
+                              ],
+                            },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            {
+                              $ifNull: [
+                                "$license_information.license_number",
+                                false,
+                              ],
+                            },
+                            {
+                              $ne: ["$license_information.license_number", ""],
+                            },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            {
+                              $ifNull: [
+                                "$uploaded_documents.state_license_document",
+                                false,
+                              ],
+                            },
+                            {
+                              $ne: [
+                                "$uploaded_documents.state_license_document",
+                                "",
+                              ],
+                            },
+                          ],
+                        },
+                        1,
+                        0,
+                      ],
+                    },
+                  ],
+                },
+                10,
+              ],
+            },
+            100,
+          ],
+        },
+      },
+    };
+
+    const useScoreFilter = minScore !== undefined || maxScore !== undefined;
+    const scoreMatch = useScoreFilter
+      ? {
+          $match: {
+            _score: {
+              ...(minScore !== undefined ? { $gte: Number(minScore) } : {}),
+              ...(maxScore !== undefined ? { $lte: Number(maxScore) } : {}),
+            },
+          },
+        }
+      : null;
+
+    const fetchRequests = useScoreFilter
+      ? VerificationRequest.aggregate([
+          { $match: filter },
+          scoreAddField,
+          scoreMatch,
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: parseInt(limit) },
+        ])
+      : VerificationRequest.find(filter)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(parseInt(limit));
+
+    const fetchTotal = useScoreFilter
+      ? VerificationRequest.aggregate([
+          { $match: filter },
+          scoreAddField,
+          scoreMatch,
+          { $count: "total" },
+        ]).then((r) => r[0]?.total ?? 0)
+      : VerificationRequest.countDocuments(filter);
+
+    // Helper: count with optional score filter applied
+    const countWith = (extra) => {
+      if (!useScoreFilter)
+        return VerificationRequest.countDocuments({ ...baseFilter, ...extra });
+      return VerificationRequest.aggregate([
+        { $match: { ...baseFilter, ...extra } },
+        scoreAddField,
+        scoreMatch,
+        { $count: "n" },
+      ]).then((r) => r[0]?.n ?? 0);
+    };
 
     const [
       requests,
@@ -726,35 +1217,16 @@ async function listPendingRequests(req, res) {
       newTodayCount,
       convertedThisWeekCount,
     ] = await Promise.all([
-      VerificationRequest.find(filter)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit)),
-      VerificationRequest.countDocuments(filter),
-      VerificationRequest.countDocuments({
-        ...baseFilter,
-        claimRequested: true,
-      }),
-      VerificationRequest.countDocuments({
-        ...baseFilter,
-        verifyRequested: true,
-      }),
-      VerificationRequest.countDocuments({ ...baseFilter, status: "pending" }),
-      VerificationRequest.countDocuments({ ...baseFilter, status: "approved" }),
-      VerificationRequest.countDocuments({ ...baseFilter, status: "rejected" }),
-      VerificationRequest.countDocuments({
-        ...baseFilter,
-        status: "auto_verified",
-      }),
-      VerificationRequest.countDocuments({
-        ...baseFilter,
-        createdAt: { $gte: todayStart },
-      }),
-      VerificationRequest.countDocuments({
-        ...baseFilter,
-        status: "approved",
-        processedAt: { $gte: weekStart },
-      }),
+      fetchRequests,
+      fetchTotal,
+      countWith({ claimRequested: true }),
+      countWith({ verifyRequested: true }),
+      countWith({ status: "pending" }),
+      countWith({ status: "approved" }),
+      countWith({ status: "rejected" }),
+      countWith({ status: "auto_verified" }),
+      countWith({ createdAt: { $gte: todayStart } }),
+      countWith({ status: "approved", processedAt: { $gte: weekStart } }),
     ]);
 
     // Duplicate detection — flag VRs that share license_number or business_name with another pending request
@@ -792,12 +1264,88 @@ async function listPendingRequests(req, res) {
     );
 
     const enrichedRequests = requests.map((r) => ({
-      ...r.toObject(),
+      ...(typeof r.toObject === "function" ? r.toObject() : r),
       duplicateFlag:
         (r.license_information?.license_number &&
           dupLicenses.has(r.license_information.license_number)) ||
         (r.legal_business_name && dupNames.has(r.legal_business_name)),
     }));
+
+    const VALID_STATES = [
+      "AL",
+      "AK",
+      "AZ",
+      "AR",
+      "CA",
+      "CO",
+      "CT",
+      "DE",
+      "FL",
+      "GA",
+      "HI",
+      "ID",
+      "IL",
+      "IN",
+      "IA",
+      "KS",
+      "KY",
+      "LA",
+      "ME",
+      "MD",
+      "MA",
+      "MI",
+      "MN",
+      "MS",
+      "MO",
+      "MT",
+      "NE",
+      "NV",
+      "NH",
+      "NJ",
+      "NM",
+      "NY",
+      "NC",
+      "ND",
+      "OH",
+      "OK",
+      "OR",
+      "PA",
+      "RI",
+      "SC",
+      "SD",
+      "TN",
+      "TX",
+      "UT",
+      "VT",
+      "VA",
+      "WA",
+      "WV",
+      "WI",
+      "WY",
+      "DC",
+    ];
+    const stateFacet = await VerificationRequest.aggregate([
+      {
+        $addFields: {
+          _stateMatch: {
+            $regexFind: {
+              input: { $ifNull: ["$physical_address", ""] },
+              regex: ",\\s*([A-Z]{2})\\b",
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          _state: {
+            $ifNull: [{ $arrayElemAt: ["$_stateMatch.captures", 0] }, null],
+          },
+        },
+      },
+      { $match: { _state: { $in: VALID_STATES } } },
+      { $group: { _id: "$_state", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
 
     res.json({
       success: true,
@@ -820,6 +1368,9 @@ async function listPendingRequests(req, res) {
         autoVerifiedCount,
         newTodayCount,
         convertedThisWeekCount,
+      },
+      facets: {
+        states: stateFacet,
       },
     });
   } catch (error) {
@@ -1096,6 +1647,19 @@ async function createRequestMessage(req, res) {
       fromAdmin: true,
       senderName: req.user?.name || "Admin",
     });
+
+    // Send email to operator
+    const request = await VerificationRequest.findById(req.params.id).lean();
+    if (request) {
+      const toEmail = request.contact_person?.email_address;
+      const businessName = request.legal_business_name || "your business";
+      if (toEmail) {
+        sendAdminMessageEmail(toEmail, businessName, body.trim()).catch((err) =>
+          console.error("Failed to send admin message email:", err),
+        );
+      }
+    }
+
     res.status(201).json({ success: true, data: message });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -1130,33 +1694,25 @@ async function createPendingRequest(req, res) {
         .status(400)
         .json({ success: false, error: "business_phone_number is required" });
     if (!contact_person?.full_name)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "contact_person.full_name is required",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "contact_person.full_name is required",
+      });
     if (!contact_person?.email_address)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "contact_person.email_address is required",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "contact_person.email_address is required",
+      });
     if (!contact_person?.phone_number)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "contact_person.phone_number is required",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "contact_person.phone_number is required",
+      });
     if (!contact_person?.role_or_position)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "contact_person.role_or_position is required",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "contact_person.role_or_position is required",
+      });
 
     const request = await VerificationRequest.create({
       legal_business_name,
