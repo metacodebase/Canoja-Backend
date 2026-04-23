@@ -350,6 +350,7 @@ async function listCanojaVerified(req, res) {
       minRating,
       licenseStatus,
       serviceType,
+      claimed,
       page = 1,
       limit = 50,
     } = req.query;
@@ -383,6 +384,8 @@ async function listCanojaVerified(req, res) {
       filter.subtypes = { $elemMatch: { $regex: /delivery/i } };
     if (serviceType === "pickup")
       filter.subtypes = { $elemMatch: { $regex: /pickup|pick.up/i } };
+    if (claimed === "claimed") filter.claimed = true;
+    if (claimed === "unclaimed") filter.claimed = { $ne: true };
     if (hasMenu === "true")
       filter.$or = [
         { menu_link: { $exists: true, $ne: null, $ne: "" } },
@@ -473,6 +476,8 @@ async function listCanojaVerified(req, res) {
       openNowCount,
       deliveryCount,
       avgRatingResult,
+      claimedCount,
+      unclaimedCount,
     ] = await Promise.all([
       LicenseRecord.find(filter)
         .sort({ createdAt: -1 })
@@ -526,6 +531,8 @@ async function listCanojaVerified(req, res) {
         },
         { $group: { _id: null, avg: { $avg: "$rating" } } },
       ]),
+      LicenseRecord.countDocuments({ ...baseFilter, claimed: true }),
+      LicenseRecord.countDocuments({ ...baseFilter, claimed: { $ne: true } }),
     ]);
 
     const totalBadgeViews = viewsResult[0]?.totalViews || 0;
@@ -554,6 +561,8 @@ async function listCanojaVerified(req, res) {
         openNow: openNowCount,
         deliveryReady: deliveryCount,
         avgRating,
+        claimed: claimedCount,
+        unclaimed: unclaimedCount,
       },
       facets: {
         states: statesFacet,
@@ -1720,8 +1729,8 @@ async function createPendingRequest(req, res) {
       business_phone_number,
       website_or_social_media_link: website_or_social_media_link || "",
       business_type: business_type || undefined,
-      claimRequested: requestType === "claim",
-      verifyRequested: requestType === "verify",
+      claimRequested: true,
+      verifyRequested: false,
       contact_person: {
         full_name: contact_person.full_name,
         email_address: contact_person.email_address,

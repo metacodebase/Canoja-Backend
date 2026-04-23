@@ -706,6 +706,13 @@ const approveRequest = async (req, res) => {
       });
     }
 
+    if (!["pending", "in_review"].includes(request.status)) {
+      return res.status(400).json({
+        success: false,
+        error: `Cannot approve a request with status "${request.status}".`,
+      });
+    }
+
     // Update request status
     request.status = "approved";
     request.adminVerifiedRequired = false;
@@ -799,7 +806,7 @@ const approveRequest = async (req, res) => {
 
     await request.save();
     await AuditLog.create({
-      actor: req.user._id,
+      actor: (req.admin || req.user)?._id,
       action: "approve_verification",
       targetType: "VerificationRequest",
       targetId: request._id,
@@ -851,7 +858,7 @@ const rejectRequest = async (req, res) => {
     }
     await request.save();
     await AuditLog.create({
-      actor: req.user._id,
+      actor: (req.admin || req.user)?._id,
       action: "reject_verification",
       targetType: "VerificationRequest",
       targetId: request._id,
