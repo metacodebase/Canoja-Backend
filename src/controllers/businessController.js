@@ -2,7 +2,6 @@ const LicenseRecord = require("../models/licenseRecord");
 const VerificationRequest = require("../models/verificationRequest");
 const BusinessView = require("../models/businessView");
 const AnalyticsEvent = require("../models/analyticsEvent");
-const { uploadToS3 } = require("../utils/s3Upload");
 const User = require("../models/user");
 const PasswordResetOTP = require("../models/passwordResetOTP");
 const { sendEmailChangeOTP } = require("../utils/emailService");
@@ -194,7 +193,7 @@ async function getBusinessProfile(req, res) {
     const business = await getActiveBusiness(
       userId,
       req,
-      "business_name dba business_address business_phone_number contact_information website_or_social_media_link working_hours business_status description about",
+      "business_name dba business_address business_phone_number contact_information website_or_social_media_link working_hours business_status description about photo menu",
     );
 
     if (!business) {
@@ -225,6 +224,9 @@ async function getBusinessProfile(req, res) {
         business_status: business.business_status,
         description: business.description,
         about: business.about,
+        menu: business.menu || null,
+        photo: business.photo || null,
+        photo_url: business.photo || null,
       },
     });
   } catch (error) {
@@ -356,6 +358,57 @@ async function toggleBusinessVisibility(req, res) {
     res.status(500).json({
       success: false,
       error: "Failed to update business visibility",
+      details: error.message,
+    });
+  }
+}
+
+// --- Upload Business Profile Photo ---
+async function uploadPhoto(req, res) {
+  try {
+    const userId = req.user?.id || req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: "Authentication required",
+      });
+    }
+
+    const business = await getActiveBusiness(userId, req);
+
+    if (!business) {
+      return res.status(404).json({
+        success: false,
+        error: "No business found for this user",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: "Photo file is required",
+      });
+    }
+
+    const photoUrl = req.file.location;
+
+    business.photo = photoUrl;
+    await business.save();
+
+    res.json({
+      success: true,
+      message: "Profile photo uploaded successfully",
+      data: {
+        photo_url: photoUrl,
+        photo: photoUrl,
+      },
+    });
+  } catch (error) {
+    console.error("Error uploading profile photo:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to upload profile photo",
       details: error.message,
     });
   }
@@ -864,6 +917,7 @@ module.exports = {
   toggleBusinessVisibility,
   toggleSpotlight,
   uploadMenu,
+  uploadPhoto,
   getEngagementStats,
   recordView,
   recordEvent,
