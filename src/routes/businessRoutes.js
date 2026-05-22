@@ -2,59 +2,20 @@ const express = require("express");
 const router = express.Router();
 const businessController = require("../controllers/businessController");
 const { authMiddleware } = require("../middleware/authMiddleware");
-const multer = require("multer");
-const multerS3 = require("multer-s3");
-const s3 = require("../config/s3Config");
-const path = require("path");
+const { createS3Upload } = require("../utils/createS3Upload");
 
-// Multer configuration for menu uploads
-const menuUpload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.AWS_BUCKET_NAME,
-    key: function (req, file, cb) {
-      // Generate unique filename with timestamp
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const fileExtension = path.extname(file.originalname);
-      const fileName = `menus/${uniqueSuffix}${fileExtension}`;
-      cb(null, fileName);
-    },
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    metadata: function (req, file, cb) {
-      cb(null, {
-        fieldName: file.fieldname,
-        userId: req.user ? req.user.id : "anonymous",
-        uploadDate: new Date().toISOString(),
-      });
-    },
-  }),
-  fileFilter: function (req, file, cb) {
-    // Allowed file extensions for menus
-    const allowedExtensions = /\.(jpeg|jpg|png|pdf)$/i;
-    const extname = allowedExtensions.test(file.originalname);
+const menuUpload = createS3Upload({
+  folder: "menus",
+  maxFileSize: 20 * 1024 * 1024,
+  allowPdf: true,
+  label: "menus",
+});
 
-    // Allowed MIME types
-    const allowedMimeTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "application/pdf",
-    ];
-    const mimetype = allowedMimeTypes.includes(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Only images (JPEG, PNG) and PDF files are allowed for menus",
-        ),
-      );
-    }
-  },
-  limits: {
-    fileSize: 20 * 1024 * 1024, // 20MB limit for menu files
-  },
+const photoUpload = createS3Upload({
+  folder: "photos",
+  maxFileSize: 10 * 1024 * 1024,
+  allowPdf: false,
+  label: "profile photos",
 });
 
 /**
@@ -115,6 +76,17 @@ router.put("/visibility", businessController.toggleBusinessVisibility);
  * @access  Private
  */
 router.post("/menu", menuUpload.single("menu"), businessController.uploadMenu);
+
+/**
+ * @route   POST /api/business/photo
+ * @desc    Upload business profile photo (JPEG or PNG)
+ * @access  Private
+ */
+router.post(
+  "/photo",
+  photoUpload.single("photo"),
+  businessController.uploadPhoto,
+);
 
 /**
  * @route   GET /api/business/engagement
