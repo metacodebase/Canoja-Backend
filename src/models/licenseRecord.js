@@ -1,4 +1,13 @@
 const mongoose = require("mongoose");
+const { castFlexibleDate } = require("../utils/parseDate");
+
+const FLEXIBLE_DATE_FIELDS = [
+  "issue_date",
+  "expiration_date",
+  "claimedAt",
+  "menuUploadedAt",
+  "lastVerifiedDate",
+];
 
 const licenseRecordSchema = new mongoose.Schema(
   {
@@ -213,6 +222,10 @@ licenseRecordSchema.index({ license_status: 1, license_type: 1 });
 licenseRecordSchema.index({ smoke_shop: 1, city: 1 });
 licenseRecordSchema.index({ rating: -1 });
 licenseRecordSchema.index({ business_name: "text" });
+
+for (const field of FLEXIBLE_DATE_FIELDS) {
+  licenseRecordSchema.path(field)._castFunction = castFlexibleDate;
+}
 
 module.exports = mongoose.model(
   "LicenseRecord",
