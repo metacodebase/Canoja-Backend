@@ -563,76 +563,69 @@ function buildKeywordQuery(keyword, filters) {
   return searchConditions.length > 0 ? { $and: searchConditions } : {};
 }
 
-function isShopOpenNow(shop) {
-  // If permanently closed, definitely not open
-  if (shop.business_status === "PERMANENTLY_CLOSED") {
-    return false;
-  }
-
-  // If temporarily closed, not open
-  if (shop.business_status === "CLOSED_TEMPORARILY") {
-    return false;
-  }
-
-  // If no working hours available
-  if (!shop.working_hours || Object.keys(shop.working_hours).length === 0) {
-    if (shop.business_status === "OPERATIONAL") {
-      return null; // Unknown - operational but no hours
+function parseWorkingHours(workingHours) {
+  if (!workingHours) return null;
+  if (typeof workingHours === "string") {
+    try {
+      return JSON.parse(workingHours);
+    } catch {
+      return null;
     }
-    return false;
+  }
+  if (typeof workingHours === "object") return workingHours;
+  return null;
+}
+
+function getTodayHoursEntry(workingHours, dayName) {
+  if (!workingHours || typeof workingHours !== "object") return null;
+
+  if (workingHours[dayName] != null) return workingHours[dayName];
+
+  const dayLower = dayName.toLowerCase();
+  const matchingKey = Object.keys(workingHours).find(
+    (key) => key.toLowerCase() === dayLower,
+  );
+  return matchingKey ? workingHours[matchingKey] : null;
+}
+
+function normalizeTodayHours(todayHours) {
+  if (todayHours == null) return null;
+  if (typeof todayHours === "string") return todayHours;
+  if (typeof todayHours === "boolean") {
+    return todayHours ? "Open 24 hours" : "Closed";
+  }
+  if (Array.isArray(todayHours)) {
+    return todayHours
+      .filter((entry) => entry != null && entry !== "")
+      .map((entry) =>
+        typeof entry === "string" ? entry : normalizeTodayHours(entry),
+      )
+      .filter(Boolean)
+      .join(",");
+  }
+  if (typeof todayHours === "object") {
+    const open = todayHours.open || todayHours.opens || todayHours.from;
+    const close = todayHours.close || todayHours.closes || todayHours.to;
+    if (open && close) return `${open}-${close}`;
+    if (todayHours.text) return String(todayHours.text);
+    if (todayHours.hours) return String(todayHours.hours);
   }
 
-  // Get current time in shop's timezone (or default to US Eastern)
-  const timeZone = shop.time_zone || "America/New_York";
-  const now = new Date();
+  return null;
+}
 
-  // Get current day and time in shop's timezone
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: timeZone,
-    weekday: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-
-  const parts = formatter.formatToParts(now);
-  const dayName = parts.find((p) => p.type === "weekday").value;
-  const hour = parseInt(parts.find((p) => p.type === "hour").value);
-  const minute = parseInt(parts.find((p) => p.type === "minute").value);
-  const currentMinutes = hour * 60 + minute;
-
-  // Get today's hours
-  const todayHours = shop.working_hours[dayName];
-
-  if (!todayHours) {
-    return false; // No hours for today means closed
-  }
-
-  // ADD THIS: Check for "Open 24 hours" case
-  if (todayHours.toLowerCase().includes("open 24 hours")) {
-    return true;
-  }
-
-  // Check for "Closed" day
-  if (todayHours.toLowerCase().includes("closed")) {
-    return false;
-  }
-
-  // Parse hours like "10a.m.-10p.m." or "12-10p.m."
-  const hoursMatch = todayHours.match(
-    /(\d+)(a\.m\.|p\.m\.)?-(\d+)(a\.m\.|p\.m\.)/i,
+function isWithinHoursRange(hoursText, currentMinutes) {
+  const hoursMatch = hoursText.match(
+    /(\d+)(?::\d+)?\s*(a\.m\.|p\.m\.|am|pm)?\s*-\s*(\d+)(?::\d+)?\s*(a\.m\.|p\.m\.|am|pm)?/i,
   );
 
-  if (!hoursMatch) {
-    return null; // Can't parse, unknown
-  }
+  if (!hoursMatch) return null;
 
-  let openHour = parseInt(hoursMatch[1]);
+  let openHour = parseInt(hoursMatch[1], 10);
   const openPeriod = hoursMatch[2];
-  let closeHour = parseInt(hoursMatch[3]);
+  let closeHour = parseInt(hoursMatch[3], 10);
   const closePeriod = hoursMatch[4];
 
-  // Convert to 24-hour format
   if (openPeriod && openPeriod.toLowerCase().includes("p") && openHour !== 12) {
     openHour += 12;
   }
@@ -658,12 +651,81 @@ function isShopOpenNow(shop) {
   const openMinutes = openHour * 60;
   const closeMinutes = closeHour * 60;
 
-  // Handle overnight hours (e.g., 10pm - 2am)
   if (closeMinutes < openMinutes) {
     return currentMinutes >= openMinutes || currentMinutes < closeMinutes;
   }
 
   return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+}
+
+function isShopOpenNow(shop) {
+  // If permanently closed, definitely not open
+  if (shop.business_status === "PERMANENTLY_CLOSED") {
+    return false;
+  }
+
+  // If temporarily closed, not open
+  if (shop.business_status === "CLOSED_TEMPORARILY") {
+    return false;
+  }
+
+  const workingHours = parseWorkingHours(shop.working_hours);
+
+  // If no working hours available
+  if (!workingHours || Object.keys(workingHours).length === 0) {
+    if (shop.business_status === "OPERATIONAL") {
+      return null; // Unknown - operational but no hours
+    }
+    return false;
+  }
+
+  // Get current time in shop's timezone (or default to US Eastern)
+  const timeZone = shop.time_zone || "America/New_York";
+  const now = new Date();
+
+  // Get current day and time in shop's timezone
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timeZone,
+    weekday: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(now);
+  const dayName = parts.find((p) => p.type === "weekday").value;
+  const hour = parseInt(parts.find((p) => p.type === "hour").value, 10);
+  const minute = parseInt(parts.find((p) => p.type === "minute").value, 10);
+  const currentMinutes = hour * 60 + minute;
+
+  const todayHours = normalizeTodayHours(
+    getTodayHoursEntry(workingHours, dayName),
+  );
+
+  if (!todayHours) {
+    return false; // No hours for today means closed
+  }
+
+  const normalizedHours = todayHours.toLowerCase();
+
+  if (normalizedHours.includes("open 24 hours") || normalizedHours === "24 hours") {
+    return true;
+  }
+
+  if (normalizedHours.includes("closed")) {
+    return false;
+  }
+
+  const periods = todayHours.split(",").map((period) => period.trim());
+  let hasUnknownPeriod = false;
+
+  for (const period of periods) {
+    const isOpen = isWithinHoursRange(period, currentMinutes);
+    if (isOpen === true) return true;
+    if (isOpen === null) hasUnknownPeriod = true;
+  }
+
+  return hasUnknownPeriod ? null : false;
 }
 
 // --- Format shop data for response (WITH BACKWARD COMPATIBILITY) ---
