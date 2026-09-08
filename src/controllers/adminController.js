@@ -1494,6 +1494,126 @@ async function createRetailer(req, res) {
   }
 }
 
+// PATCH /api/admin/retailers/:id
+async function updateRetailer(req, res) {
+  try {
+    const record = await LicenseRecord.findById(req.params.id).lean();
+    if (!record)
+      return res.status(404).json({ success: false, error: "Retailer not found" });
+
+    const fields = [
+      "business_name", "dba", "license_number", "license_type", "license_status",
+      "jurisdiction", "issue_date", "expiration_date", "business_address", "city",
+      "stateName", "postal_code", "country", "business_status", "location_link",
+      "googlePlaceId", "latitude", "longitude", "operator_name", "description",
+    ];
+    const before = {};
+    const after = {};
+    const updates = {};
+
+    for (const field of fields) {
+      if (!Object.prototype.hasOwnProperty.call(req.body, field)) continue;
+      before[field] = record[field];
+      let value = req.body[field];
+      if (["issue_date", "expiration_date"].includes(field)) {
+        value = value ? new Date(value) : null;
+        if (value && Number.isNaN(value.getTime()))
+          return res.status(400).json({ success: false, error: `Invalid ${field}` });
+      }
+      if (["latitude", "longitude"].includes(field)) {
+        value = value === "" ? null : Number(value);
+        if (value !== null && !Number.isFinite(value))
+          return res.status(400).json({ success: false, error: `Invalid ${field}` });
+      }
+      updates[field] = value;
+      after[field] = value;
+    }
+
+    const nestedFields = {
+      phone: "contact_information.phone",
+      email: "contact_information.email",
+      website: "contact_information.website",
+      owner_name: "owner.name",
+      owner_email: "owner.email",
+      owner_phone: "owner.phone",
+    };
+    for (const [input, path] of Object.entries(nestedFields)) {
+      if (!Object.prototype.hasOwnProperty.call(req.body, input)) continue;
+      const [parent, child] = path.split(".");
+      before[path] = record[parent]?.[child];
+      updates[path] = req.body[input];
+      after[path] = req.body[input];
+    }
+
+    const completenessFields = [
+      updates.business_name ?? record.business_name,
+      updates.license_number ?? record.license_number,
+      updates.stateName ?? record.stateName,
+      updates.city ?? record.city,
+      updates.business_address ?? record.business_address,
+      updates["contact_information.phone"] ?? record.contact_information?.phone,
+      updates["contact_information.email"] ?? record.contact_information?.email,
+      updates.expiration_date ?? record.expiration_date,
+      updates.license_type ?? record.license_type,
+      updates["owner.name"] ?? record.owner?.name,
+    ];
+    updates.dataCompletenessScore = Math.round(
+      completenessFields.filter((value) => value !== null && value !== undefined && value !== "").length
+      / completenessFields.length * 100,
+    );
+
+    const updatedRecord = await LicenseRecord.findByIdAndUpdate(
+      req.params.id,
+      { $set: updates },
+      { new: true, runValidators: false },
+    );
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "update_retailer",
+      targetType: "LicenseRecord",
+      targetId: updatedRecord._id,
+      before,
+      after,
+      metadata: { businessName: updatedRecord.business_name, manuallyEdited: true },
+    }).catch(() => {});
+
+    res.json({ success: true, data: updatedRecord });
+  } catch (error) {
+    if (error.name === "CastError")
+      return res.status(400).json({ success: false, error: "Invalid retailer id or field value" });
+    res.status(500).json({ success: false, error: `Unable to update retailer: ${error.message}` });
+  }
+}
+
+// DELETE /api/admin/retailers/:id
+async function deleteRetailer(req, res) {
+  try {
+    const record = await LicenseRecord.findById(req.params.id);
+    if (!record)
+      return res.status(404).json({ success: false, error: "Retailer not found" });
+
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "delete_retailer",
+      targetType: "LicenseRecord",
+      targetId: record._id,
+      before: record.toObject(),
+      metadata: {
+        businessName: record.business_name,
+        licenseNumber: record.license_number,
+        manuallyDeleted: true,
+      },
+    }).catch(() => {});
+    await record.deleteOne();
+
+    res.json({ success: true, message: "Retailer deleted successfully" });
+  } catch (error) {
+    if (error.name === "CastError")
+      return res.status(400).json({ success: false, error: "Invalid retailer id" });
+    res.status(500).json({ success: false, error: `Unable to delete retailer: ${error.message}` });
+  }
+}
+
 // PATCH /api/admin/pending-verifications/:id/escalate
 async function escalatePendingVerification(req, res) {
   try {
@@ -1778,6 +1898,8 @@ module.exports = {
   // Phase 2 additions
   listRetailers,
   createRetailer,
+  updateRetailer,
+  deleteRetailer,
   listCanojaVerified,
   issueVerification,
   listPendingVerifications,

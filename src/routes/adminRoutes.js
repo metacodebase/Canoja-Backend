@@ -25,6 +25,12 @@ router.get("/retailers", adminController.listRetailers);
 // POST /api/admin/retailers
 router.post("/retailers", adminController.createRetailer);
 
+// PATCH /api/admin/retailers/:id — manually correct retailer data
+router.patch("/retailers/:id", adminController.updateRetailer);
+
+// DELETE /api/admin/retailers/:id — remove a duplicate or invalid record
+router.delete("/retailers/:id", adminController.deleteRetailer);
+
 // GET /api/admin/canoja-verified
 // Query params: q, status (active|expiringSoon|revoked), region, source, page, limit
 router.get("/canoja-verified", adminController.listCanojaVerified);
