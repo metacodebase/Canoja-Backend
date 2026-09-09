@@ -28,7 +28,7 @@ set -euo pipefail
 source /home/ubuntu/.nvm/nvm.sh
 cd /home/ubuntu/workspace/server
 
-npm ci --omit=dev --ignore-scripts
+corepack yarn install --production=true --ignore-scripts --no-lockfile --non-interactive
 node --check index.js
 pm2 restart index --update-env
 

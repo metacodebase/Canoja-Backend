@@ -144,6 +144,21 @@ const licenseRecordSchema = new mongoose.Schema(
     // Verification
     canojaVerified: { type: Boolean, default: false },
     adminVerificationRequired: { type: Boolean, default: false },
+    duplicateOf: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LicenseRecord",
+      default: null,
+      index: true,
+    },
+    duplicateReason: String,
+    government_source: {
+      provider: String,
+      official_key: String,
+      url: String,
+      checked_at: Date,
+      hash: String,
+      missing_from_latest_source: { type: Boolean, default: false },
+    },
     plan_tier: {
       type: String,
       enum: ["free", "starter", "pro"],

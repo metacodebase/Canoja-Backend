@@ -4,6 +4,11 @@
   "main": "index.js",
   "scripts": {
     "deploy": "bash scripts/deploy.sh",
+    "refresh:government": "node scripts/refreshGovernmentData.js",
+    "refresh:government:apply": "node scripts/refreshGovernmentData.js --apply",
+    "refresh:bc": "bash scripts/runGovernmentRefreshRemote.sh british-columbia",
+    "update:bc": "bash scripts/runGovernmentRefreshRemote.sh british-columbia --apply",
+    "test:government-refresh": "node scripts/governmentRefresh/britishColumbia.test.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky"
   },
@@ -25,6 +30,7 @@
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
     "express-validator": "^7.2.1",
