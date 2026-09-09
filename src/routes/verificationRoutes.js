@@ -160,7 +160,7 @@ router.post(
  * /api/verification-requests/{requestId}/reject:
  *   post:
  *     summary: Reject a verification request
- *     description: Admin rejects a pending claim/verification request and adds a reason.
+ *     description: Admin rejects any claim/verification request, revoking an approved claim when applicable, and adds a reason.
  *     tags:
  *       - Verification
  *     security:

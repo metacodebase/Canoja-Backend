@@ -650,6 +650,7 @@ const approveRequest = async (req, res) => {
       licenseRecordId,
       request.contact_person.full_name || "",
     );
+    request.userId = user._id.toString();
 
     // Handle LicenseRecord update if found
     if (licenseRecord) {
@@ -762,7 +763,35 @@ const rejectRequest = async (req, res) => {
       });
     }
 
+    const previousStatus = request.status;
+
+    if (["approved", "auto_verified"].includes(previousStatus) && request.pharmacyId) {
+      const licenseRecord = await LicenseRecord.findById(request.pharmacyId);
+      const claimant = request.userId
+        ? await User.findById(request.userId)
+        : await User.findOne({ email: request.contact_person.email_address });
+
+      if (
+        licenseRecord?.claimedBy &&
+        claimant?._id &&
+        licenseRecord.claimedBy.toString() === claimant._id.toString()
+      ) {
+        licenseRecord.claimed = false;
+        licenseRecord.claimedBy = null;
+        licenseRecord.claimedAt = null;
+        licenseRecord.adminVerificationRequired = false;
+        licenseRecord.featured = false;
+        await licenseRecord.save();
+
+        claimant.licenseRecords = claimant.licenseRecords.filter(
+          (id) => id.toString() !== licenseRecord._id.toString(),
+        );
+        await claimant.save();
+      }
+    }
+
     request.status = "rejected";
+    request.adminVerifiedRequired = false;
     request.processedAt = new Date();
     if (reason) {
       request.notes = (request.notes || "") + `\nRejection reason: ${reason}`;
@@ -773,7 +802,7 @@ const rejectRequest = async (req, res) => {
       action: "reject_verification",
       targetType: "VerificationRequest",
       targetId: request._id,
-      before: { status: "pending" },
+      before: { status: previousStatus },
       after: { status: "rejected" },
       metadata: { reason, businessName: request.legal_business_name },
     }).catch(() => {});
