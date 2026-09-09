@@ -1568,7 +1568,7 @@ async function updateRetailer(req, res) {
       { new: true, runValidators: false },
     );
     await AuditLog.create({
-      actor: req.user._id,
+      actor: req.admin._id,
       action: "update_retailer",
       targetType: "LicenseRecord",
       targetId: updatedRecord._id,
@@ -1593,7 +1593,7 @@ async function deleteRetailer(req, res) {
       return res.status(404).json({ success: false, error: "Retailer not found" });
 
     await AuditLog.create({
-      actor: req.user._id,
+      actor: req.admin._id,
       action: "delete_retailer",
       targetType: "LicenseRecord",
       targetId: record._id,
