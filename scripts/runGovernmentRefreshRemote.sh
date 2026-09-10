@@ -35,6 +35,19 @@ fi
 
 remote_command="set -e; export LANG=C LC_ALL=C; source /home/ubuntu/.nvm/nvm.sh; cd '${remote_dir}'; node scripts/refreshGovernmentData.js --region '${region}' ${mode}"
 
+if [[ "${region}" == "michigan" ]]; then
+  source_file="$(mktemp -t canoja-michigan-source.XXXXXX.json)"
+  remote_source="/tmp/canoja-michigan-source-$$.json"
+  cleanup() {
+    rm -f "${source_file}"
+    ssh -i "${ssh_key}" -o BatchMode=yes "${remote_host}" "rm -f '${remote_source}'" >/dev/null 2>&1 || true
+  }
+  trap cleanup EXIT
+  node scripts/fetchGovernmentSource.js --region michigan --output "${source_file}"
+  scp -i "${ssh_key}" -o BatchMode=yes "${source_file}" "${remote_host}:${remote_source}"
+  remote_command="set -e; export LANG=C LC_ALL=C MICHIGAN_SOURCE_FILE='${remote_source}'; source /home/ubuntu/.nvm/nvm.sh; cd '${remote_dir}'; node scripts/refreshGovernmentData.js --region '${region}' ${mode}"
+fi
+
 ssh -i "${ssh_key}" \
   -o BatchMode=yes \
   -o ConnectTimeout=10 \

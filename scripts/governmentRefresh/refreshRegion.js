@@ -59,12 +59,13 @@ function mergeEnrichment(canonical, duplicates) {
 }
 
 function planRefresh(region, sourceRecords, databaseRecords, checkedAt) {
+  const normalizeRegionLicence = region.normalizeLicence || normalizeLicence;
   const scopedRecords = databaseRecords.filter(
     (record) => record.stateName === region.stateName,
   );
   const byLicence = new Map();
   for (const record of scopedRecords) {
-    const licence = normalizeLicence(record.license_number);
+    const licence = normalizeRegionLicence(record.license_number);
     if (!licence) continue;
     if (!byLicence.has(licence)) byLicence.set(licence, []);
     byLicence.get(licence).push(record);
@@ -95,7 +96,7 @@ function planRefresh(region, sourceRecords, databaseRecords, checkedAt) {
     let locationMatches = scopedRecords.filter(
       (record) =>
         (region.allowLocationMatchWithLicence ||
-          !normalizeLicence(record.license_number)) &&
+          !normalizeRegionLicence(record.license_number)) &&
         !matchedIds.has(String(record._id)) &&
         region.sameLocation(record, official),
     );
@@ -173,7 +174,7 @@ function planRefresh(region, sourceRecords, databaseRecords, checkedAt) {
 
   for (const record of scopedRecords) {
     if (matchedIds.has(String(record._id))) continue;
-    const licence = normalizeLicence(record.license_number);
+    const licence = normalizeRegionLicence(record.license_number);
     const isGovernmentRecord = region.isGovernmentRecord
       ? region.isGovernmentRecord(record)
       : record.regulatory_body === "Liquor and Cannabis Regulation Branch" ||
