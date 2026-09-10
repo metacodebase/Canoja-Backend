@@ -2,12 +2,13 @@ require("dotenv").config({ quiet: true });
 const mongoose = require("mongoose");
 const alberta = require("./governmentRefresh/regions/alberta");
 const britishColumbia = require("./governmentRefresh/regions/britishColumbia");
+const colorado = require("./governmentRefresh/regions/colorado");
 const michigan = require("./governmentRefresh/regions/michigan");
 const ontario = require("./governmentRefresh/regions/ontario");
 const { refreshRegion } = require("./governmentRefresh/refreshRegion");
 
 const REGIONS = new Map(
-  [alberta, britishColumbia, michigan, ontario].map((region) => [
+  [alberta, britishColumbia, colorado, michigan, ontario].map((region) => [
     region.id,
     region,
   ]),
