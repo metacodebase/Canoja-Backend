@@ -6,9 +6,13 @@
     "deploy": "bash scripts/deploy.sh",
     "refresh:government": "node scripts/refreshGovernmentData.js",
     "refresh:government:apply": "node scripts/refreshGovernmentData.js --apply",
+    "refresh:ab": "bash scripts/runGovernmentRefreshRemote.sh alberta",
+    "update:ab": "bash scripts/runGovernmentRefreshRemote.sh alberta --apply",
     "refresh:bc": "bash scripts/runGovernmentRefreshRemote.sh british-columbia",
     "update:bc": "bash scripts/runGovernmentRefreshRemote.sh british-columbia --apply",
-    "test:government-refresh": "node scripts/governmentRefresh/britishColumbia.test.js",
+    "refresh:on": "bash scripts/runGovernmentRefreshRemote.sh ontario",
+    "update:on": "bash scripts/runGovernmentRefreshRemote.sh ontario --apply",
+    "test:government-refresh": "node scripts/governmentRefresh/britishColumbia.test.js && node scripts/governmentRefresh/alberta.test.js && node scripts/governmentRefresh/ontario.test.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky"
   },
@@ -44,7 +48,8 @@
     "nodemailer": "^7.0.5",
     "path-to-regexp": "^8.2.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

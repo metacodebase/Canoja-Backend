@@ -118,7 +118,7 @@ async function listRetailers(req, res) {
       sort = "createdAt_desc",
     } = req.query;
 
-    const filter = {};
+    const filter = { visibility: { $ne: false } };
 
     if (q) {
       const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");

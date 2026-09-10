@@ -26,6 +26,9 @@ function mergeEnrichment(canonical, duplicates) {
     "photos",
     "working_hours",
     "business_status",
+    "website",
+    "domain",
+    "phone",
   ];
   const update = {};
   for (const field of fields) {
@@ -42,6 +45,15 @@ function mergeEnrichment(canonical, duplicates) {
         record[field] !== "",
     );
     if (source) update[field] = source[field];
+  }
+  for (const field of ["phone", "email", "website"]) {
+    if (canonical.contact_information?.[field]) continue;
+    const source = duplicates.find(
+      (record) => record.contact_information?.[field],
+    );
+    if (source)
+      update[`contact_information.${field}`] =
+        source.contact_information[field];
   }
   return update;
 }
@@ -60,7 +72,9 @@ function planRefresh(region, sourceRecords, databaseRecords, checkedAt) {
 
   const matchedIds = new Set();
   const sourceLicences = new Set(
-    sourceRecords.map((record) => record.licenceNumber).filter(Boolean),
+    sourceRecords
+      .map((record) => record.matchLicence || record.licenceNumber)
+      .filter(Boolean),
   );
   const operations = [];
   const summary = {
@@ -69,19 +83,30 @@ function planRefresh(region, sourceRecords, databaseRecords, checkedAt) {
     updated: 0,
     duplicatesHidden: 0,
     staleFlagged: 0,
+    discoveryUnverified: 0,
     discoveryUntouched: 0,
   };
 
   for (const official of sourceRecords) {
-    const licenceMatches = official.licenceNumber
-      ? byLicence.get(official.licenceNumber) || []
+    const officialLicence = official.matchLicence || official.licenceNumber;
+    const licenceMatches = officialLicence
+      ? byLicence.get(officialLicence) || []
       : [];
-    const locationMatches = scopedRecords.filter(
+    let locationMatches = scopedRecords.filter(
       (record) =>
-        !normalizeLicence(record.license_number) &&
+        (region.allowLocationMatchWithLicence ||
+          !normalizeLicence(record.license_number)) &&
         !matchedIds.has(String(record._id)) &&
         region.sameLocation(record, official),
     );
+    if (!locationMatches.length && region.uniqueLocationFallback) {
+      const fallbackMatches = scopedRecords.filter(
+        (record) =>
+          !matchedIds.has(String(record._id)) &&
+          region.uniqueLocationFallback(record, official),
+      );
+      if (fallbackMatches.length === 1) locationMatches = fallbackMatches;
+    }
     const candidates = [
       ...new Map(
         [...licenceMatches, ...locationMatches].map((record) => [
@@ -149,10 +174,14 @@ function planRefresh(region, sourceRecords, databaseRecords, checkedAt) {
   for (const record of scopedRecords) {
     if (matchedIds.has(String(record._id))) continue;
     const licence = normalizeLicence(record.license_number);
-    const isGovernmentRecord =
-      record.regulatory_body === "Liquor and Cannabis Regulation Branch" ||
-      /^450\d{3}$/.test(licence);
-    if (isGovernmentRecord && licence && !sourceLicences.has(licence)) {
+    const isGovernmentRecord = region.isGovernmentRecord
+      ? region.isGovernmentRecord(record)
+      : record.regulatory_body === "Liquor and Cannabis Regulation Branch" ||
+        /^450\d{3}$/.test(licence);
+    const shouldFlagStale = region.shouldFlagStale
+      ? region.shouldFlagStale(record, sourceLicences)
+      : isGovernmentRecord && licence && !sourceLicences.has(licence);
+    if (shouldFlagStale) {
       operations.push({
         updateOne: {
           filter: { _id: record._id, stateName: region.stateName },
@@ -171,6 +200,24 @@ function planRefresh(region, sourceRecords, databaseRecords, checkedAt) {
         },
       });
       summary.staleFlagged += 1;
+    } else if (
+      region.unverifyUnmatched &&
+      (record.canojaVerified || record.verified)
+    ) {
+      operations.push({
+        updateOne: {
+          filter: { _id: record._id, stateName: region.stateName },
+          update: {
+            $set: {
+              canojaVerified: false,
+              verified: false,
+              adminVerificationRequired: true,
+              updatedAt: checkedAt,
+            },
+          },
+        },
+      });
+      summary.discoveryUnverified += 1;
     } else {
       summary.discoveryUntouched += 1;
     }
