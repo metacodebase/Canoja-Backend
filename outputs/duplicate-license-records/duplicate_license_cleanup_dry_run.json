@@ -1,0 +1,3905 @@
+{
+  "generatedAt": "2026-09-10T10:47:23.520Z",
+  "mode": "DRY_RUN_ONLY",
+  "productionWrites": 0,
+  "summary": {
+    "reviewedGroups": 185,
+    "readyGroups": 184,
+    "blockedGroups": 1,
+    "readyDuplicateRecords": 184
+  },
+  "plans": [
+    {
+      "license": "40200069",
+      "status": "READY",
+      "canonicalRecordId": "69fa74af71871854e7801a75",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c04"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c04",
+        "duplicateReason <= 69fa74b171871854e7801c04"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200110",
+      "status": "READY",
+      "canonicalRecordId": "69fa74ae71871854e7801a23",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801bba"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801bba",
+        "duplicateReason <= 69fa74b171871854e7801bba"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200146",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348da9",
+      "duplicateRecordIds": [
+        "691b321495bbccfcda348db5"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 691b321495bbccfcda348db5",
+        "duplicateReason <= 691b321495bbccfcda348db5"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200242",
+      "status": "READY",
+      "canonicalRecordId": "69fa74b171871854e7801ac7",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801be8"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801be8",
+        "duplicateReason <= 69fa74b171871854e7801be8"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200247",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348cf1",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c0b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c0b",
+        "duplicateReason <= 69fa74b171871854e7801c0b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200347",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348cee",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c1f"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c1f",
+        "duplicateReason <= 69fa74b171871854e7801c1f"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200401",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348cf6",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801bad"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801bad",
+        "duplicateReason <= 69fa74b171871854e7801bad"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200581",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c34",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c4a"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c4a",
+        "duplicateReason <= 69fa74b171871854e7801c4a"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200667",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348d0c",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c26"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c26",
+        "duplicateReason <= 69fa74b171871854e7801c26"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200789",
+      "status": "READY",
+      "canonicalRecordId": "69fa74ae71871854e7801a0b",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c49"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c49",
+        "duplicateReason <= 69fa74b171871854e7801c49"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200840",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348dbf",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c40"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c40",
+        "duplicateReason <= 69fa74b171871854e7801c40"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200848",
+      "status": "READY",
+      "canonicalRecordId": "691b321595bbccfcda349079",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801bd3"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801bd3",
+        "duplicateReason <= 69fa74b171871854e7801bd3"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200883",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c4f",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c02"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c02",
+        "duplicateReason <= 69fa74b171871854e7801c02"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40200966",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c60",
+      "duplicateRecordIds": [
+        "691b321495bbccfcda348e7c"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 691b321495bbccfcda348e7c",
+        "duplicateReason <= 691b321495bbccfcda348e7c"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40201005",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348e9d",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801c3b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801c3b",
+        "duplicateReason <= 69fa74b171871854e7801c3b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40201119",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c3d",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801ba2"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801ba2",
+        "duplicateReason <= 69fa74b171871854e7801ba2"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40201130",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348d04",
+      "duplicateRecordIds": [
+        "69fa74b071871854e7801aae"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b071871854e7801aae",
+        "duplicateReason <= 69fa74b071871854e7801aae"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40201170",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c3e",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801bb1"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801bb1",
+        "duplicateReason <= 69fa74b171871854e7801bb1"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40201171",
+      "status": "READY",
+      "canonicalRecordId": "69fa74ac71871854e78019ab",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801bac"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801bac",
+        "duplicateReason <= 69fa74b171871854e7801bac"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40201194",
+      "status": "READY",
+      "canonicalRecordId": "69fa74ad71871854e7801a06",
+      "duplicateRecordIds": [
+        "69fa74af71871854e7801a5a"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74af71871854e7801a5a",
+        "duplicateReason <= 69fa74af71871854e7801a5a"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "40201725",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c33",
+      "duplicateRecordIds": [
+        "691b321495bbccfcda348d01"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 691b321495bbccfcda348d01",
+        "duplicateReason <= 691b321495bbccfcda348d01"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01068",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348cec",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801dcd"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801dcd",
+        "duplicateReason <= 69fa74b171871854e7801dcd"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01069",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348cef",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801dce"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801dce",
+        "duplicateReason <= 69fa74b171871854e7801dce"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01071",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c31",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801db2"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801db2",
+        "duplicateReason <= 69fa74b171871854e7801db2"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01072",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c30",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801db0"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801db0",
+        "duplicateReason <= 69fa74b171871854e7801db0"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01076",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c2b",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801db3"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801db3",
+        "duplicateReason <= 69fa74b171871854e7801db3"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01078",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348cf2",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801db4"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801db4",
+        "duplicateReason <= 69fa74b171871854e7801db4"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01086",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c3f",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801dd2"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801dd2",
+        "duplicateReason <= 69fa74b171871854e7801dd2"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01092",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c28",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801de2"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801de2",
+        "duplicateReason <= 69fa74b171871854e7801de2"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01104",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c2e",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801e19"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801e19",
+        "duplicateReason <= 69fa74b171871854e7801e19"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01106",
+      "status": "READY",
+      "canonicalRecordId": "69fa74af71871854e7801a61",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801d11"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801d11",
+        "duplicateReason <= 69fa74b171871854e7801d11"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01115",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c3c",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801de0"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801de0",
+        "duplicateReason <= 69fa74b171871854e7801de0"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01119",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348deb",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801ce5"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801ce5",
+        "duplicateReason <= 69fa74b171871854e7801ce5"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01121",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c41",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801e16"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801e16",
+        "duplicateReason <= 69fa74b171871854e7801e16"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "402r01130",
+      "status": "READY",
+      "canonicalRecordId": "691b321495bbccfcda348c45",
+      "duplicateRecordIds": [
+        "69fa74b171871854e7801ce6"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 69fa74b171871854e7801ce6",
+        "duplicateReason <= 69fa74b171871854e7801ce6"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000103",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd1a9cec7ea8e1d10cb9",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d11057"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d11057",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d11057"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000108",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff6b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d11009"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d11009",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d11009"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000109",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff66",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d11069"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d11069",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d11069"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000125",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d1068a",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d1106b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d1106b",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d1106b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000126",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd1a9cec7ea8e1d10d43",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d11042"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d11042",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d11042"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000128",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d10685",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d11027"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d11027",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d11027"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000129",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d1071b",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d1106a"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d1106a",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d1106a"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000132",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10538",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d11046"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d11046",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d11046"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000134",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d104a0",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d11043"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d11043",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d11043"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000138",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d103b3",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d1101c"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d1101c",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d1101c"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000139",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10422",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d1104d"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d1104d",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d1104d"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000141",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10332",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d11032"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d11032",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d11032"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000142",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d102a7",
+      "duplicateRecordIds": [
+        "6a00fd1b9cec7ea8e1d11037"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1b9cec7ea8e1d11037",
+        "duplicateReason <= 6a00fd1b9cec7ea8e1d11037"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000152",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fc5e",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d1102c"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d1102c",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d1102c"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000153",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fc61",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d11008"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d11008",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d11008"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000157",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fdca",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d11011"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d11011",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d11011"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000159",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fd7d",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ffb"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ffb",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ffb"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000163",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10325",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d11025"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d11025",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d11025"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000171",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d104e3",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10fe3"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10fe3",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10fe3"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000178",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d100fb",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d1100b"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000186",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d108b1",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10fc0"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10fc0",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10fc0"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000191",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff60",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10fe2"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10fe2",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10fe2"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000200",
+      "status": "READY",
+      "canonicalRecordId": "691b321e95bbccfcda349cf5",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10fb4"
+      ],
+      "fieldsToMerge": [
+        "operator_name <= 6a00fd1a9cec7ea8e1d10fb4",
+        "sourceType <= 6a00fd1a9cec7ea8e1d10fb4",
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10fb4",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10fb4"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000205",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d10ad1",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f98"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f98",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f98"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000206",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fc89",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f86"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f86",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f86"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000211",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d100f6",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f81"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000215",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d10048",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f91"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f91",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f91"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000219",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d106b3",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f8c"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f8c",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f8c"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000222",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d106e4",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f73"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f73",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f73"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000231",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10585",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f52"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f52",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f52"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000232",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10587",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f53"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f53",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f53"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000233",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d1097b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f48"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f48",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f48"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000234",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d10999",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f43"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f43",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f43"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000235",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1059d",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f3c"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f3c",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f3c"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000241",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d104c9",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f46"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f46",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f46"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000247",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1044a",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f03"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f03",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f03"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000250",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1041b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10efc"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10efc",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10efc"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000251",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10426",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10f28"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10f28",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10f28"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000253",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d103f1",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ebe"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ebe",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ebe"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000255",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1039b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ee8"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000258",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10364",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ee1"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ee1",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ee1"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000259",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10116",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ee5"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ee5",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ee5"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000262",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fe98",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10edb"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10edb",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10edb"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000263",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10328",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ee3"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ee3",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ee3"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000267",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d102d2",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ec1"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ec1",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ec1"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000278",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10258",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10eac"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10eac",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10eac"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000287",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fd27",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e8c"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e8c",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e8c"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000289",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fcc0",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e91"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e91",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e91"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000291",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10117",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e6a"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e6a",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e6a"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000293",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10140",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e78"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e78",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e78"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000294",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d10764",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e79"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e79",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e79"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000295",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d100d4",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e7d"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e7d",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e7d"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000296",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d100c9",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e7e"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e7e",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e7e"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000299",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d10067",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e7b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e7b",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e7b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000300",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d100aa",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e61"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e61",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e61"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000301",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d10083",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e60"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e60",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e60"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000303",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d106d2",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e5f"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e5f",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e5f"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000304",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ffc2",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e77"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e77",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e77"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000305",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d106c4",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e71"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000307",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ffe0",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e5d"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e5d",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e5d"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000310",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d106ef",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e5a"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e5a",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e5a"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000311",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ffe6",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e57"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e57",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e57"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000316",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd1a9cec7ea8e1d10d07",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e33"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e33",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e33"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000320",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fead",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e12"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e12",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e12"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000321",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fec0",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e1b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e1b",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e1b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000323",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d10623",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e24"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e24",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e24"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000326",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d10604",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10e05"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10e05",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10e05"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000332",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fd7a",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10dea"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10dea",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10dea"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000335",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1059c",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ded"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ded",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ded"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000336",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d105b6",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10dc6"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10dc6",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10dc6"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000337",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fd41",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10de4"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10de4",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10de4"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000338",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fcf3",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10dd5"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10dd5",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10dd5"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000339",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fcbe",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10dd9"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10dd9",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10dd9"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000342",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1055b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10da2"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10da2",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10da2"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000346",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1059b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10dc9"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10dc9",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10dc9"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000348",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10533",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10da3"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10da3",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10da3"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000352",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d105a9",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10db1"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10db1",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10db1"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000361",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10516",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d7d"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d7d",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d7d"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000362",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10504",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d89"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d89",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d89"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000366",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d10087",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d68"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d68",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d68"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000368",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1054a",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d6b"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000371",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fdbb",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d66"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d66",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d66"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000373",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d104f1",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d2e"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d2e",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d2e"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000374",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d104ae",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d44"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d44",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d44"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000387",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10475",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d40"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d40",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d40"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000390",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d104a5",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d17"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d17",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d17"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000391",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d104a4",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d00"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d00",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d00"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000392",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1049b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d2b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d2b",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d2b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000393",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10497",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d2d"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d2d",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d2d"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000394",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1047b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d0b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d0b",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d0b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000395",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10440",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10d13"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10d13",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10d13"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000411",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10435",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10cf6"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10cf6",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10cf6"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000415",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d103b2",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10cb2"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10cb2",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10cb2"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000422",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1035c",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10cca"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10cca",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10cca"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000425",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd1a9cec7ea8e1d10c25",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ca2"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ca2",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ca2"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000430",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1034e",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10bfd"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10bfd",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10bfd"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000435",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1031c",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10cb8"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10cb8",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10cb8"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000443",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10306",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10c46"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10c46",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10c46"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000454",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10280",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10c5b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10c5b",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10c5b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000459",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1025b",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10c08"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10c08",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10c08"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000460",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d10234",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10c5a"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10c5a",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10c5a"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000471",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d101ea",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10c32"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000477",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd1a9cec7ea8e1d10bc0",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10bca"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10bca",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10bca"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000479",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1022e",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10bcf"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000480",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d101d0",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10be5"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10be5",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10be5"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000487",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1019e",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10ae6"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10ae6",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10ae6"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000490",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1015d",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10ba7"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10ba7",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10ba7"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000495",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d1014d",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10b68"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10b68",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10b68"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000501",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d100c7",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10b7e"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10b7e",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10b7e"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000506",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d10af3",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10b10"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10b10",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10b10"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000507",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d100a5",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10aaf"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10aaf",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10aaf"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000508",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d100e7",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a93"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a93",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a93"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000509",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d100de",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10b73"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10b73",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10b73"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000510",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd189cec7ea8e1d100ca",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10b28"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10b28",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10b28"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000519",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d1009b",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10ab3"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10ab3",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10ab3"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000521",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d1006c",
+      "duplicateRecordIds": [
+        "6a00fd1a9cec7ea8e1d10b24"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd1a9cec7ea8e1d10b24",
+        "duplicateReason <= 6a00fd1a9cec7ea8e1d10b24"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000523",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fffe",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10ad6"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10ad6",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10ad6"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000526",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ffe9",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10ad5"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10ad5",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10ad5"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000530",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ffed",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10ac1"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10ac1",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10ac1"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000534",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ffee",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10aca"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10aca",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10aca"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000536",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ffd1",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10acd"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10acd",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10acd"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000541",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd199cec7ea8e1d10aa0",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10acb"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10acb",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10acb"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000543",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff46",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a73"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a73",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a73"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000549",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff56",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a4d"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a4d",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a4d"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000550",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff72",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a7c"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a7c",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a7c"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000551",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff55",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a26"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a26",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a26"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000552",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff35",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109fe"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109fe",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109fe"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000553",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0feef",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a57"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a57",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a57"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000557",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0ff05",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a63"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a63",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a63"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000561",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0feff",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a46"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a46",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a46"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000566",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fed3",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109c4"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109c4",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109c4"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000570",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fe78",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109ba"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109ba",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109ba"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000572",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fe71",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10a03"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10a03",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10a03"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000573",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fe79",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109bc"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109bc",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109bc"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000578",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fe00",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109a3"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109a3",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109a3"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000583",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fdc2",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109d6"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109d6",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109d6"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000584",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fde7",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109ed"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109ed",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109ed"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000589",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fda2",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109cd"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109cd",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109cd"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000592",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fdc0",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109ef"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000600",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fcec",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109cc"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109cc",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109cc"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000602",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fcf0",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109a5"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109a5",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109a5"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000604",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fd15",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109a8"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109a8",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109a8"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000608",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fca8",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d109b1"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d109b1",
+        "duplicateReason <= 6a00fd199cec7ea8e1d109b1"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000610",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fc6d",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d1094b"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d1094b",
+        "duplicateReason <= 6a00fd199cec7ea8e1d1094b"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000611",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fca3",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10995"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10995",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10995"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000615",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fc71",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d1099f"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d1099f",
+        "duplicateReason <= 6a00fd199cec7ea8e1d1099f"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000617",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd169cec7ea8e1d0fc4d",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10940"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10940",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10940"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000619",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd169cec7ea8e1d0fc4e",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10923"
+      ],
+      "fieldsToMerge": [],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur000620",
+      "status": "READY",
+      "canonicalRecordId": "6a00fd179cec7ea8e1d0fc6b",
+      "duplicateRecordIds": [
+        "6a00fd199cec7ea8e1d10925"
+      ],
+      "fieldsToMerge": [
+        "duplicateOf <= 6a00fd199cec7ea8e1d10925",
+        "duplicateReason <= 6a00fd199cec7ea8e1d10925"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": []
+    },
+    {
+      "license": "aur001311",
+      "status": "BLOCKED",
+      "canonicalRecordId": "6a00fd1a9cec7ea8e1d10c2f",
+      "duplicateRecordIds": [
+        "691b321b95bbccfcda34990f"
+      ],
+      "fieldsToMerge": [
+        "googlePlaceId <= 691b321b95bbccfcda34990f",
+        "place_id <= 691b321b95bbccfcda34990f",
+        "google_id <= 691b321b95bbccfcda34990f",
+        "cid <= 691b321b95bbccfcda34990f",
+        "kgmid <= 691b321b95bbccfcda34990f",
+        "reviews_id <= 691b321b95bbccfcda34990f",
+        "type <= 691b321b95bbccfcda34990f",
+        "subtypes <= 691b321b95bbccfcda34990f",
+        "category <= 691b321b95bbccfcda34990f",
+        "time_zone <= 691b321b95bbccfcda34990f",
+        "contact_information.phone <= 691b321b95bbccfcda34990f",
+        "contact_information.website <= 691b321b95bbccfcda34990f",
+        "location <= 691b321b95bbccfcda34990f",
+        "latitude <= 691b321b95bbccfcda34990f",
+        "longitude <= 691b321b95bbccfcda34990f",
+        "rating <= 691b321b95bbccfcda34990f",
+        "reviews <= 691b321b95bbccfcda34990f",
+        "reviews_link <= 691b321b95bbccfcda34990f",
+        "photos_count <= 691b321b95bbccfcda34990f",
+        "photo <= 691b321b95bbccfcda34990f",
+        "street_view <= 691b321b95bbccfcda34990f",
+        "business_status <= 691b321b95bbccfcda34990f",
+        "about <= 691b321b95bbccfcda34990f",
+        "area_service <= 691b321b95bbccfcda34990f",
+        "location_link <= 691b321b95bbccfcda34990f",
+        "owner_id <= 691b321b95bbccfcda34990f",
+        "owner_title <= 691b321b95bbccfcda34990f",
+        "owner_link <= 691b321b95bbccfcda34990f",
+        "owner <= 691b321b95bbccfcda34990f",
+        "entity_type <= 691b321b95bbccfcda34990f",
+        "gps_validation <= 691b321b95bbccfcda34990f",
+        "dataCompletenessScore <= 691b321b95bbccfcda34990f"
+      ],
+      "referencesToRepoint": {
+        "verificationRequests": 0,
+        "users": 0,
+        "analyticsEvents": 0,
+        "businessViews": 0,
+        "duplicatePointers": 0,
+        "businessViewUniqueConflicts": 0
+      },
+      "blockers": [
+        "Duplicate record is claimed or Canoja Verified: 691b321b95bbccfcda34990f"
+      ]
+    }
+  ]
+}
