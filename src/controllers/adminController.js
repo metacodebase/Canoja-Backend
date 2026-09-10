@@ -1,9 +1,103 @@
+const mongoose = require("mongoose");
 const User = require("../models/user");
 const VerificationRequest = require("../models/verificationRequest");
 const LicenseRecord = require("../models/licenseRecord");
 const AuditLog = require("../models/auditLog");
 const RequestMessage = require("../models/requestMessage");
 const { sendAdminMessageEmail } = require("../utils/emailService");
+
+const normalizedLicenseNumber = (value) =>
+  String(value || "").trim().toUpperCase();
+const normalizedBusinessValue = (value) =>
+  String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+const hasValue = (value) =>
+  value !== null && value !== undefined && value !== "" &&
+  (!Array.isArray(value) || value.length > 0);
+const mergeMissingFields = (record, sibling) => {
+  const merged = { ...record };
+  Object.entries(sibling).forEach(([key, value]) => {
+    if (!hasValue(merged[key]) && hasValue(value)) merged[key] = value;
+  });
+  ["contact_information", "owner", "government_source"].forEach((key) => {
+    merged[key] = { ...(sibling[key] || {}), ...(merged[key] || {}) };
+    Object.keys(merged[key]).forEach((field) => {
+      if (!hasValue(merged[key][field]) && hasValue(sibling[key]?.[field])) {
+        merged[key][field] = sibling[key][field];
+      }
+    });
+  });
+  return merged;
+};
+
+async function hydrateBusinessRecords(records) {
+  const plainRecords = records.map((record) =>
+    typeof record.toObject === "function" ? record.toObject() : record,
+  );
+  const names = [...new Set(plainRecords.flatMap((record) =>
+    [record.business_name, record.dba].filter(Boolean),
+  ))];
+  if (!names.length) return plainRecords;
+
+  const candidates = await LicenseRecord.find({
+    $or: names.flatMap((name) => {
+      const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const exact = new RegExp(`^${escaped}$`, "i");
+      return [{ business_name: exact }, { dba: exact }];
+    }),
+  }).lean();
+
+  return plainRecords.map((record) => {
+    const identities = new Set(
+      [record.business_name, record.dba].map(normalizedBusinessValue).filter(Boolean),
+    );
+    const siblings = candidates.filter((candidate) => {
+      const sameName = [candidate.business_name, candidate.dba]
+        .map(normalizedBusinessValue)
+        .some((name) => identities.has(name));
+      const sameState = !record.stateName || !candidate.stateName ||
+        normalizedBusinessValue(record.stateName) === normalizedBusinessValue(candidate.stateName);
+      const sameCity = !record.city || !candidate.city ||
+        normalizedBusinessValue(record.city) === normalizedBusinessValue(candidate.city);
+      return candidate._id.toString() !== record._id.toString() && sameName && sameState && sameCity;
+    });
+    return siblings.reduce(mergeMissingFields, record);
+  });
+}
+
+async function attachBusinessProfiles(requests) {
+  const plainRequests = requests.map((request) => request.toObject());
+  const pharmacyIds = plainRequests
+    .map((request) => request.pharmacyId)
+    .filter((id) => mongoose.Types.ObjectId.isValid(id));
+  const licenseNumbers = plainRequests
+    .map((request) => normalizedLicenseNumber(request.license_information?.license_number))
+    .filter(Boolean);
+
+  if (!pharmacyIds.length && !licenseNumbers.length) return plainRequests;
+
+  const licensePatterns = licenseNumbers.map(
+    (license) => new RegExp(`^${license.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
+  );
+  const matchedProfiles = await LicenseRecord.find({
+    $or: [
+      ...(pharmacyIds.length ? [{ _id: { $in: pharmacyIds } }] : []),
+      ...(licensePatterns.length ? [{ license_number: { $in: licensePatterns } }] : []),
+    ],
+  }).lean();
+  const profiles = await hydrateBusinessRecords(matchedProfiles);
+  const byId = new Map(profiles.map((profile) => [profile._id.toString(), profile]));
+  const byLicense = new Map(
+    profiles.map((profile) => [normalizedLicenseNumber(profile.license_number), profile]),
+  );
+
+  return plainRequests.map((request) => ({
+    ...request,
+    business_profile:
+      byId.get(String(request.pharmacyId || "")) ||
+      byLicense.get(normalizedLicenseNumber(request.license_information?.license_number)) ||
+      null,
+  }));
+}
 
 async function listUsers(req, res) {
   try {
@@ -67,9 +161,11 @@ async function listVerificationHistory(req, res) {
       VerificationRequest.countDocuments(filter),
     ]);
 
+    const enrichedRequests = await attachBusinessProfiles(requests);
+
     res.json({
       success: true,
-      data: requests,
+      data: enrichedRequests,
       pagination: {
         total,
         page: parseInt(page),
@@ -224,7 +320,8 @@ async function listRetailers(req, res) {
     const vrMap = Object.fromEntries(
       latestVRs.map((v) => [v._id, { status: v.status, method: v.method }]),
     );
-    const enrichedRecords = records.map((r) => ({
+    const hydratedRecords = await hydrateBusinessRecords(records);
+    const enrichedRecords = hydratedRecords.map((r) => ({
       ...r,
       _vrStatus: vrMap[r._id.toString()] || null,
     }));
@@ -548,9 +645,11 @@ async function listCanojaVerified(req, res) {
         ? parseFloat(avgRatingResult[0].avg.toFixed(1))
         : null;
 
+    const hydratedRecords = await hydrateBusinessRecords(records);
+
     res.json({
       success: true,
-      data: records,
+      data: hydratedRecords,
       pagination: {
         total,
         page: parseInt(page),
@@ -868,9 +967,11 @@ async function listPendingVerifications(req, res) {
           : `${(avgMs / 3600000).toFixed(1)}h`
         : null;
 
+    const enrichedRequests = await attachBusinessProfiles(requests);
+
     res.json({
       success: true,
-      data: requests,
+      data: enrichedRequests,
       pagination: {
         total,
         page: parseInt(page),
@@ -1279,8 +1380,9 @@ async function listPendingRequests(req, res) {
       otherPending.map((r) => r.legal_business_name).filter(Boolean),
     );
 
-    const enrichedRequests = requests.map((r) => ({
-      ...(typeof r.toObject === "function" ? r.toObject() : r),
+    const requestsWithProfiles = await attachBusinessProfiles(requests);
+    const enrichedRequests = requestsWithProfiles.map((r) => ({
+      ...r,
       duplicateFlag:
         (r.license_information?.license_number &&
           dupLicenses.has(r.license_information.license_number)) ||
