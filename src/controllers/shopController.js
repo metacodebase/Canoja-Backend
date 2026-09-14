@@ -622,6 +622,21 @@ function buildKeywordQuery(keyword, filters) {
   return searchConditions.length > 0 ? { $and: searchConditions } : {};
 }
 
+function escapeSearchPattern(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function buildLicenseLocationConditions(location) {
+  return String(location || "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const regex = new RegExp(escapeSearchPattern(part), "i");
+      return { $or: [{ city: regex }, { stateName: regex }, { business_address: regex }] };
+    });
+}
+
 function parseWorkingHours(workingHours) {
   if (!workingHours) return null;
   if (typeof workingHours === "string") {
@@ -1053,18 +1068,22 @@ async function compareShops(req, res) {
       country,
       filters = {},
       keyword = null,
+      licenseNumber = null,
+      location = null,
       page = 1,
       limit = 10,
       sortBy = null,
     } = req.body;
 
-    const isKeywordSearch = keyword && keyword.trim().length >= 1;
+    const normalizedLicense = String(licenseNumber || "").trim();
+    const isLicenseSearch = normalizedLicense.length >= 1;
+    const isKeywordSearch = !isLicenseSearch && keyword && keyword.trim().length >= 1;
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
     console.log(
-      `\n=== Starting ${isKeywordSearch ? "KEYWORD" : "LOCATION-BASED"} search ===`,
+      `\n=== Starting ${isLicenseSearch ? "LICENSE" : isKeywordSearch ? "KEYWORD" : "LOCATION-BASED"} search ===`,
     );
     if (isKeywordSearch) console.log(`Keyword: "${keyword}"`);
     console.log(`Filters:`, JSON.stringify(filters));
@@ -1074,7 +1093,29 @@ async function compareShops(req, res) {
     let shops = [];
     let totalCount = 0;
 
-    if (isKeywordSearch) {
+    if (isLicenseSearch) {
+      const locationConditions = buildLicenseLocationConditions(location);
+      const exactQuery = {
+        $and: [
+          { license_number: new RegExp(`^${escapeSearchPattern(normalizedLicense)}$`, "i") },
+          { visibility: { $ne: false } },
+          ...locationConditions,
+        ],
+      };
+      shops = await LicenseRecord.find(exactQuery).limit(1).lean();
+
+      if (!shops.length) {
+        const closeQuery = {
+          $and: [
+            { license_number: new RegExp(escapeSearchPattern(normalizedLicense), "i") },
+            { visibility: { $ne: false } },
+            ...locationConditions,
+          ],
+        };
+        shops = await LicenseRecord.find(closeQuery).sort({ license_number: 1 }).limit(limitNum).lean();
+      }
+      totalCount = shops.length;
+    } else if (isKeywordSearch) {
       // ===== KEYWORD SEARCH MODE =====
       console.log(`Building keyword search query...`);
       query = buildKeywordQuery(keyword, filters);
@@ -1226,11 +1267,11 @@ async function compareShops(req, res) {
     }
 
     // IMPORTANT: For keyword search, still need to format
-    let formattedShops = isKeywordSearch
+    let formattedShops = isKeywordSearch || isLicenseSearch
       ? shops.map((shop) => formatShopData(shop, lat, lng))
       : shops; // Already formatted for location-based searches
 
-    if (isKeywordSearch) {
+    if (isKeywordSearch || isLicenseSearch) {
       formattedShops = applySearchFilters(formattedShops, filters);
       formattedShops = applySorting(formattedShops, sortBy);
       // totalCount = formattedShops.length;
@@ -1279,7 +1320,7 @@ async function compareShops(req, res) {
         },
 
         search_info: {
-          search_type: isKeywordSearch ? "keyword" : "location",
+          search_type: isLicenseSearch ? "license" : isKeywordSearch ? "keyword" : "location",
           keyword: isKeywordSearch ? keyword : null,
           location: !isKeywordSearch ? { lat, lng, radius: finalRadius } : null,
           geocoded_location:
