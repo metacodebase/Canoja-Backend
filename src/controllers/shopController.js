@@ -1119,6 +1119,19 @@ async function compareShops(req, res) {
       // ===== KEYWORD SEARCH MODE =====
       console.log(`Building keyword search query...`);
       query = buildKeywordQuery(keyword, filters);
+      const hasCoordinates = Number.isFinite(Number(req.body.lat)) && Number.isFinite(Number(req.body.lng)) && req.body.lat != null && req.body.lng != null;
+      if (hasCoordinates || zipCode || state || city) {
+        const center = hasCoordinates
+          ? { success: true, lat: Number(req.body.lat), lng: Number(req.body.lng) }
+          : await geocodeAddress(state, city, zipCode, country);
+        if (!center.success) {
+          return res.status(400).json({ success: false, error: "Failed to geocode address for radius-based search" });
+        }
+        lat = center.lat;
+        lng = center.lng;
+        finalRadius = radius ? parseInt(radius) : 5000;
+        query = { $and: [query, buildLocationQuery(lat, lng, finalRadius, filters)] };
+      }
 
       totalCount = await LicenseRecord.countDocuments(query);
 
