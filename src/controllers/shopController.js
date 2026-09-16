@@ -1,3 +1,4 @@
+const { escapeSearchPattern, buildLicenseLocationConditions } = require("../utils/licenseLocation");
 const LicenseRecord = require("../models/licenseRecord");
 
 // --- Classify cannabis shop as medical or recreational ---
@@ -157,7 +158,10 @@ function buildDirectFilterQuery(country, state, city, filters) {
   }
   if (filters.featured !== undefined) {
     query.featured = filters.featured;
-    if (filters.featured === true) {
+  }
+  if (filters.spotlight !== undefined) {
+    query.featured = filters.spotlight;
+    if (filters.spotlight === true) {
       query.plan_tier = { $in: ["starter", "pro"] };
       query.claimed = true;
     }
@@ -369,6 +373,7 @@ function applySearchFilters(shops, filters) {
     }
 
     // Featured filter
+    if (filters.spotlight !== undefined && shop.spotlight !== filters.spotlight) return false;
     if (filters.featured && !shop.featured) {
       return false;
     }
@@ -413,8 +418,8 @@ function applySearchFilters(shops, filters) {
   });
 }
 
-function applySorting(shops, sortBy) {
-  if (!sortBy) return shops;
+function applySorting(shops, sortBy, prioritizeSpotlight = false, prioritizeFeatured = false) {
+  if (!sortBy && !prioritizeSpotlight && !prioritizeFeatured) return shops;
   const sorted = [...shops];
   if (sortBy === "rating") {
     sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -425,6 +430,8 @@ function applySorting(shops, sortBy) {
       ),
     );
   }
+  if (prioritizeFeatured) sorted.sort((a, b) => Number(b.featured === true) - Number(a.featured === true));
+  if (prioritizeSpotlight) sorted.sort((a, b) => Number(b.spotlight === true) - Number(a.spotlight === true));
   return sorted;
 }
 
@@ -496,7 +503,10 @@ function buildLocationQuery(lat, lng, radius, filters) {
   }
   if (filters.featured !== undefined) {
     query.featured = filters.featured;
-    if (filters.featured === true) {
+  }
+  if (filters.spotlight !== undefined) {
+    query.featured = filters.spotlight;
+    if (filters.spotlight === true) {
       query.plan_tier = { $in: ["starter", "pro"] };
       query.claimed = true;
     }
@@ -587,7 +597,10 @@ function buildKeywordQuery(keyword, filters) {
   }
   if (filters.featured !== undefined) {
     searchConditions.push({ featured: filters.featured });
-    if (filters.featured === true) {
+  }
+  if (filters.spotlight !== undefined) {
+    searchConditions.push({ featured: filters.spotlight });
+    if (filters.spotlight === true) {
       searchConditions.push({ plan_tier: { $in: ["starter", "pro"] } });
       searchConditions.push({ claimed: true });
     }
@@ -622,20 +635,6 @@ function buildKeywordQuery(keyword, filters) {
   return searchConditions.length > 0 ? { $and: searchConditions } : {};
 }
 
-function escapeSearchPattern(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function buildLicenseLocationConditions(location) {
-  return String(location || "")
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .map((part) => {
-      const regex = new RegExp(escapeSearchPattern(part), "i");
-      return { $or: [{ city: regex }, { stateName: regex }, { business_address: regex }] };
-    });
-}
 
 function parseWorkingHours(workingHours) {
   if (!workingHours) return null;
@@ -960,6 +959,8 @@ function formatShopData(record, userLat = null, userLng = null) {
       : record.canojaVerified || false,
     claimed: record.claimed || false,
     featured: record.featured || false,
+    spotlight: record.featured || false,
+    plan_tier: record.plan_tier || "free",
     adminVerificationRequired: record.adminVerificationRequired || false,
     isMatched: record.canojaVerified || false, // BACKWARD COMPATIBLE
     matchedLicense: record.canojaVerified
@@ -1073,6 +1074,8 @@ async function compareShops(req, res) {
       page = 1,
       limit = 10,
       sortBy = null,
+      prioritizeSpotlight = false,
+      prioritizeFeatured = false,
     } = req.body;
 
     const normalizedLicense = String(licenseNumber || "").trim();
@@ -1094,7 +1097,11 @@ async function compareShops(req, res) {
     let totalCount = 0;
 
     if (isLicenseSearch) {
-      const locationConditions = buildLicenseLocationConditions(location);
+      const locationConditions = [
+        ...buildLicenseLocationConditions(location),
+        buildDirectFilterQuery(country, state, city, filters),
+        ...(zipCode ? [{ postal_code: new RegExp(`^${escapeSearchPattern(String(zipCode).trim())}$`, "i") }] : []),
+      ];
       const exactQuery = {
         $and: [
           { license_number: new RegExp(`^${escapeSearchPattern(normalizedLicense)}$`, "i") },
@@ -1102,9 +1109,11 @@ async function compareShops(req, res) {
           ...locationConditions,
         ],
       };
-      shops = await LicenseRecord.find(exactQuery).limit(1).lean();
-
-      if (!shops.length) {
+      const exactCount = await LicenseRecord.countDocuments(exactQuery);
+      totalCount = exactCount;
+      if (exactCount) {
+        shops = await LicenseRecord.find(exactQuery).sort({ license_number: 1 }).skip(skip).limit(limitNum).lean();
+      } else {
         const closeQuery = {
           $and: [
             { license_number: new RegExp(escapeSearchPattern(normalizedLicense), "i") },
@@ -1112,9 +1121,9 @@ async function compareShops(req, res) {
             ...locationConditions,
           ],
         };
-        shops = await LicenseRecord.find(closeQuery).sort({ license_number: 1 }).limit(limitNum).lean();
+        totalCount = await LicenseRecord.countDocuments(closeQuery);
+        shops = await LicenseRecord.find(closeQuery).sort({ license_number: 1 }).skip(skip).limit(limitNum).lean();
       }
-      totalCount = shops.length;
     } else if (isKeywordSearch) {
       // ===== KEYWORD SEARCH MODE =====
       console.log(`Building keyword search query...`);
@@ -1138,7 +1147,7 @@ async function compareShops(req, res) {
       shops = await LicenseRecord.find(query)
         .skip(skip)
         .limit(limitNum)
-        .sort({ business_name: 1 })
+        .sort({ ...(prioritizeSpotlight === true ? {featured: -1} : {}), ...(prioritizeFeatured === true ? {featured: -1} : {}), ...getDirectFilterSort(sortBy) })
         .lean();
 
       console.log(
@@ -1173,7 +1182,7 @@ async function compareShops(req, res) {
         });
 
         shopsWithDistance = applySearchFilters(shopsWithDistance, filters);
-        shopsWithDistance = applySorting(shopsWithDistance, sortBy);
+        shopsWithDistance = applySorting(shopsWithDistance, sortBy, prioritizeSpotlight === true, prioritizeFeatured === true);
         totalCount = shopsWithDistance.length;
         shops = shopsWithDistance.slice(skip, skip + limitNum);
       } else if (zipCode || radius) {
@@ -1215,7 +1224,7 @@ async function compareShops(req, res) {
         });
 
         shopsWithDistance = applySearchFilters(shopsWithDistance, filters);
-        shopsWithDistance = applySorting(shopsWithDistance, sortBy);
+        shopsWithDistance = applySorting(shopsWithDistance, sortBy, prioritizeSpotlight === true, prioritizeFeatured === true);
         totalCount = shopsWithDistance.length;
         shops = shopsWithDistance.slice(skip, skip + limitNum);
       } else if (country || state || city) {
@@ -1235,7 +1244,7 @@ async function compareShops(req, res) {
           console.log(`Could not geocode location for response display`);
         }
 
-        const sortOptions = getDirectFilterSort(sortBy);
+        const sortOptions = { ...(prioritizeSpotlight === true ? {featured: -1} : {}), ...(prioritizeFeatured === true ? {featured: -1} : {}), ...getDirectFilterSort(sortBy) };
 
         if (needsInMemoryFiltering(filters)) {
           // Rare path: favorites / openSearch need the full set in memory
@@ -1247,7 +1256,7 @@ async function compareShops(req, res) {
 
           let formattedShops = allShops.map((shop) => formatShopData(shop));
           formattedShops = applySearchFilters(formattedShops, filters);
-          formattedShops = applySorting(formattedShops, sortBy);
+          formattedShops = applySorting(formattedShops, sortBy, prioritizeSpotlight === true, prioritizeFeatured === true);
           totalCount = formattedShops.length;
           shops = formattedShops.slice(skip, skip + limitNum);
         } else {
@@ -1286,7 +1295,7 @@ async function compareShops(req, res) {
 
     if (isKeywordSearch || isLicenseSearch) {
       formattedShops = applySearchFilters(formattedShops, filters);
-      formattedShops = applySorting(formattedShops, sortBy);
+      formattedShops = applySorting(formattedShops, sortBy, prioritizeSpotlight === true, prioritizeFeatured === true);
       // totalCount = formattedShops.length;
     }
     const totalPages = Math.ceil(totalCount / limitNum);

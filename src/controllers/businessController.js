@@ -1047,7 +1047,7 @@ async function confirmEmailChange(req, res) {
   }
 }
 
-// --- Toggle Spotlight (featured) ---
+// --- Toggle Spotlight ---
 async function toggleSpotlight(req, res) {
   try {
     const userId = req.user?.id || req.user?._id;
