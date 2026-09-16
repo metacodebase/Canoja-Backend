@@ -958,8 +958,8 @@ function formatShopData(record, userLat = null, userLng = null) {
       ? false
       : record.canojaVerified || false,
     claimed: record.claimed || false,
-    featured: record.featured || false,
-    spotlight: record.featured || false,
+    featured: record.featured === true && record.claimed === true && ["starter", "pro"].includes(record.plan_tier),
+    spotlight: record.featured === true && record.claimed === true && ["starter", "pro"].includes(record.plan_tier),
     plan_tier: record.plan_tier || "free",
     adminVerificationRequired: record.adminVerificationRequired || false,
     isMatched: record.canojaVerified || false, // BACKWARD COMPATIBLE
