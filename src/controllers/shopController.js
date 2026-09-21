@@ -189,11 +189,6 @@ function buildDirectFilterQuery(country, state, city, filters) {
   if (filters.medical !== undefined) {
     query.license_type = new RegExp("medical", "i");
   }
-  if (filters.openNow === true) {
-    query.open_now = true;
-  } else if (filters.openNow === false) {
-    query.open_now = { $ne: true };
-  }
   if (filters.hasMenu) {
     query.$or = [
       { menu_link: { $exists: true, $nin: [null, ""] } },
@@ -245,7 +240,7 @@ function applySearchFilters(shops, filters) {
 
   return shops.filter((shop) => {
     // Cannoja Verified
-    if (filters.cannojaVerified) {
+    if (filters.canojaVerified === true || filters.cannojaVerified === true) {
       if (!shop.canojaVerified) {
         return false;
       }
@@ -439,6 +434,7 @@ function applySorting(shops, sortBy, prioritizeSpotlight = false, prioritizeFeat
 // scanning the full result set (e.g. favorites list, keyword openSearch).
 function needsInMemoryFiltering(filters) {
   if (!filters || Object.keys(filters).length === 0) return false;
+  if (filters.canojaVerified === true || filters.cannojaVerified === true || typeof filters.openNow === "boolean") return true;
   if (
     filters.favorites &&
     Array.isArray(filters.favorites) &&
@@ -542,7 +538,7 @@ function buildKeywordQuery(keyword, filters) {
   const searchConditions = [];
 
   // Text search on multiple fields
-  const keywordRegex = new RegExp(keyword, "i");
+  const keywordRegex = new RegExp(escapeSearchPattern(keyword), "i");
 
   searchConditions.push({
     $or: [
@@ -689,15 +685,15 @@ function normalizeTodayHours(todayHours) {
 
 function isWithinHoursRange(hoursText, currentMinutes) {
   const hoursMatch = hoursText.match(
-    /(\d+)(?::\d+)?\s*(a\.m\.|p\.m\.|am|pm)?\s*-\s*(\d+)(?::\d+)?\s*(a\.m\.|p\.m\.|am|pm)?/i,
+    /(\d{1,2})(?::(\d{2}))?\s*(a\.m\.|p\.m\.|am|pm)?\s*[-–—]\s*(\d{1,2})(?::(\d{2}))?\s*(a\.m\.|p\.m\.|am|pm)?/i,
   );
 
   if (!hoursMatch) return null;
 
   let openHour = parseInt(hoursMatch[1], 10);
-  const openPeriod = hoursMatch[2];
-  let closeHour = parseInt(hoursMatch[3], 10);
-  const closePeriod = hoursMatch[4];
+  const openPeriod = hoursMatch[3];
+  let closeHour = parseInt(hoursMatch[4], 10);
+  const closePeriod = hoursMatch[6];
 
   if (openPeriod && openPeriod.toLowerCase().includes("p") && openHour !== 12) {
     openHour += 12;
@@ -721,8 +717,8 @@ function isWithinHoursRange(hoursText, currentMinutes) {
     closeHour = 0;
   }
 
-  const openMinutes = openHour * 60;
-  const closeMinutes = closeHour * 60;
+  const openMinutes = openHour * 60 + Number(hoursMatch[2] || 0);
+  const closeMinutes = closeHour * 60 + Number(hoursMatch[5] || 0);
 
   if (closeMinutes < openMinutes) {
     return currentMinutes >= openMinutes || currentMinutes < closeMinutes;
@@ -1067,7 +1063,7 @@ async function compareShops(req, res) {
       city,
       zipCode,
       country,
-      filters = {},
+      filters: requestedFilters = {},
       keyword = null,
       licenseNumber = null,
       location = null,
@@ -1077,6 +1073,12 @@ async function compareShops(req, res) {
       prioritizeSpotlight = false,
       prioritizeFeatured = false,
     } = req.body;
+
+    const filters = {...requestedFilters};
+    if (filters.canojaVerified === undefined && filters.cannojaVerified !== undefined) {
+      filters.canojaVerified = filters.cannojaVerified;
+    }
+    delete filters.cannojaVerified;
 
     const normalizedLicense = String(licenseNumber || "").trim();
     const isLicenseSearch = normalizedLicense.length >= 1;
@@ -1094,6 +1096,7 @@ async function compareShops(req, res) {
 
     let query = {};
     let shops = [];
+    let shopsAreFormatted = false;
     let totalCount = 0;
 
     if (isLicenseSearch) {
@@ -1144,11 +1147,17 @@ async function compareShops(req, res) {
 
       totalCount = await LicenseRecord.countDocuments(query);
 
-      shops = await LicenseRecord.find(query)
-        .skip(skip)
-        .limit(limitNum)
-        .sort({ ...(prioritizeSpotlight === true ? {featured: -1} : {}), ...(prioritizeFeatured === true ? {featured: -1} : {}), ...getDirectFilterSort(sortBy) })
-        .lean();
+      const keywordResults = LicenseRecord.find(query)
+        .sort({ ...(prioritizeSpotlight === true ? {featured: -1} : {}), ...(prioritizeFeatured === true ? {featured: -1} : {}), ...getDirectFilterSort(sortBy) });
+      if (needsInMemoryFiltering(filters)) {
+        const candidates = await keywordResults.lean();
+        const matching = applySearchFilters(candidates.map(shop => formatShopData(shop, lat, lng)), filters);
+        totalCount = matching.length;
+        shops = applySorting(matching, sortBy, prioritizeSpotlight === true, prioritizeFeatured === true).slice(skip, skip + limitNum);
+        shopsAreFormatted = true;
+      } else {
+        shops = await keywordResults.skip(skip).limit(limitNum).lean();
+      }
 
       console.log(
         `Found ${totalCount} total shops matching keyword "${keyword}"`,
@@ -1289,7 +1298,7 @@ async function compareShops(req, res) {
     }
 
     // IMPORTANT: For keyword search, still need to format
-    let formattedShops = isKeywordSearch || isLicenseSearch
+    let formattedShops = (isKeywordSearch || isLicenseSearch) && !shopsAreFormatted
       ? shops.map((shop) => formatShopData(shop, lat, lng))
       : shops; // Already formatted for location-based searches
 
